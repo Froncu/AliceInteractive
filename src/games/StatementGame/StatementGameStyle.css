@@ -1,7 +1,16 @@
-
 .statement-game {
   position: absolute;
   width: 100%;
   height: 100%;
+  background-color: #fafafa;
 }
 
+.follow-image {
+  pointer-events: none; /* Prevent the image from being interacted with directly */
+  position: absolute; /* Position absolutely within its container */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Cover the card area, maintaining aspect ratio */
+}

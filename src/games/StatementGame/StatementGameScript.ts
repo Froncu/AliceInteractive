@@ -1,6 +1,5 @@
 import { defineComponent, ref, onMounted, watchEffect } from 'vue';
 import DilemmaCard from '@/components/DilemmaCard/DilemmaCard.vue';
-import logo from '@/assets/logo.png'; // Import the image
 
 export default defineComponent({
   name: 'StatementGame',
@@ -8,7 +7,13 @@ export default defineComponent({
     DilemmaCard
   },
   setup() {
-    const imageSrc = ref(logo);
+    const imageSrc = ref<string | undefined>(undefined);
+
+    import('@/assets/logo.png').then((module) => {
+      imageSrc.value = module.default;
+    });
+
+    const textContent = ref('Hellooo.');
 
     const imageStyle = ref<Partial<CSSStyleDeclaration>>({
       position: 'absolute',
@@ -39,7 +44,8 @@ export default defineComponent({
     return {
       imageSrc,
       imageStyle,
-      updateImagePosition
+      updateImagePosition,
+      textContent // Expose textContent to the template
     };
   }
 });

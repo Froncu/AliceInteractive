@@ -1,12 +1,10 @@
-<template>
-  <div class="statement-game">
-    <DilemmaCard @mouse-move="updateImagePosition">
-      <template #image>
-        <img :src="currentImagePath" :style="imageStyle" class="follow-image" />
-      </template>
-      <template #text>
-        <p>{{ currentTextContent }}</p>
-      </template>
-    </DilemmaCard>
-  </div>
-</template>
+<div class="statement-game">
+  <DilemmaCard @mouse-move="updateImagePosition">
+    <template #image>
+      <img :src="imagePath" :style="imageStyle" class="follow-image" />
+    </template>
+    <template #text>
+      <p>{{ textContent }}</p>
+    </template>
+  </DilemmaCard>
+</div>

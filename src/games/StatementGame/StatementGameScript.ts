@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, watchEffect } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import DilemmaCard from '@/components/DilemmaCard/DilemmaCard.vue';
 
 export default defineComponent({
@@ -8,18 +8,20 @@ export default defineComponent({
   },
   setup() {
     const imagePath = ref<string | undefined>(undefined);
-    const textContent = ref<string>('Loading...'); // Default text while loading
+    const textContent = ref<string>('Loading...');
 
     const imageStyle = ref<Partial<CSSStyleDeclaration>>({
       position: 'absolute',
-      left: '0',
-      top: '0',
-      width: '100%',
-      height: '100%',
-      objectFit: 'fill'
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 'auto',
+      height: 'auto',
+      maxWidth: '100%',
+      maxHeight: '100%',
+      objectFit: 'contain'
     });
 
-    // Function to fetch data from the JSON file
     const fetchData = async () => {
       try {
         const response = await fetch('/assets/cardData.json');
@@ -32,31 +34,13 @@ export default defineComponent({
       }
     };
 
-    const updateImagePosition = () => {
-      const cardElement = document.querySelector('.dilemma-card') as HTMLElement;
-      if (cardElement) {
-        imageStyle.value = {
-          position: 'absolute',
-          left: '0',
-          top: '0',
-          width: '100%',
-          height: '100%',
-          objectFit: 'fill'
-        };
-      }
-    };
-
     onMounted(() => {
-      fetchData(); // Fetch data when component mounts
-      updateImagePosition();
+      fetchData();
     });
-
-    watchEffect(updateImagePosition);
 
     return {
       imagePath,
       imageStyle,
-      updateImagePosition,
       textContent
     };
   }

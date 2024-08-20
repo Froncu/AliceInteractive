@@ -12,6 +12,9 @@
 }
 
 .image-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
   width: 100%;
   height: calc(100% - 50px); /* Adjust height to leave space for text */
   overflow: hidden;

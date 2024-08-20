@@ -35,8 +35,10 @@ export default defineComponent({
       }
     };
 
-    const handleMouseUp = () => {
-      isDragging.value = false;
+    const handleMouseUp = (event: MouseEvent) => {
+      if (event.button === 0) {
+        isDragging.value = false;
+      }
     };
 
     const adjustFontSize = () => {
@@ -54,7 +56,7 @@ export default defineComponent({
     onMounted(() => {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
-      
+
       // Watch for changes in the text content or container size
       const resizeObserver = new ResizeObserver(() => adjustFontSize());
       if (textContainer.value) {
@@ -68,7 +70,7 @@ export default defineComponent({
     onUnmounted(() => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
-      
+
       // Clean up ResizeObserver
       if (textContainer.value) {
         const resizeObserver = new ResizeObserver(() => adjustFontSize());

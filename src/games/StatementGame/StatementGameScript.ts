@@ -9,19 +9,7 @@ export default defineComponent({
   setup() {
     const imagePath = ref<string | undefined>(undefined);
     const textContent = ref<string>('Loading...');
-
-    const imageStyle = ref<Partial<CSSStyleDeclaration>>({
-      position: 'absolute',
-      left: '50%',
-      top: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: 'auto',
-      height: 'auto',
-      maxWidth: '100%',
-      maxHeight: '100%',
-      objectFit: 'contain'
-    });
-
+    
     const fetchData = async () => {
       try {
         const response = await fetch('/assets/cardData.json');
@@ -40,7 +28,6 @@ export default defineComponent({
 
     return {
       imagePath,
-      imageStyle,
       textContent
     };
   }

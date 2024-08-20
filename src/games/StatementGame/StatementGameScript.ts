@@ -7,13 +7,8 @@ export default defineComponent({
     DilemmaCard
   },
   setup() {
-    const imageSrc = ref<string | undefined>(undefined);
-
-    import('@/assets/logo.png').then((module) => {
-      imageSrc.value = module.default;
-    });
-
-    const textContent = ref('Hellooo.');
+    const imagePath = ref<string | undefined>(undefined);
+    const textContent = ref<string>('Loading...'); // Default text while loading
 
     const imageStyle = ref<Partial<CSSStyleDeclaration>>({
       position: 'absolute',
@@ -21,8 +16,21 @@ export default defineComponent({
       top: '0',
       width: '100%',
       height: '100%',
-      objectFit: 'fill' // Ensure the image stretches to fill the card
+      objectFit: 'fill'
     });
+
+    // Function to fetch data from the JSON file
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/assets/cardData.json');
+        const data = await response.json();
+        imagePath.value = data.imagePath;
+        textContent.value = data.textContent;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        textContent.value = 'Error loading data.';
+      }
+    };
 
     const updateImagePosition = () => {
       const cardElement = document.querySelector('.dilemma-card') as HTMLElement;
@@ -33,19 +41,23 @@ export default defineComponent({
           top: '0',
           width: '100%',
           height: '100%',
-          objectFit: 'fill' // Ensures image stretches to fill the entire card
+          objectFit: 'fill'
         };
       }
     };
 
-    onMounted(updateImagePosition);
+    onMounted(() => {
+      fetchData(); // Fetch data when component mounts
+      updateImagePosition();
+    });
+
     watchEffect(updateImagePosition);
 
     return {
-      imageSrc,
+      imagePath,
       imageStyle,
       updateImagePosition,
-      textContent // Expose textContent to the template
+      textContent
     };
   }
 });

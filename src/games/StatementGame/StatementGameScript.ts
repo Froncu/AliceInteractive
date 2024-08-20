@@ -11,7 +11,7 @@ export default defineComponent({
   setup() {
     const imagePath = ref<string | undefined>(undefined);
     const textContent = ref<string>('Loading...');
-    
+
     const fetchData = async () => {
       try {
         const response = await fetch('/assets/cardData.json');

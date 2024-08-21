@@ -1,14 +1,26 @@
 [
   {
     "imagePath": "/assets/hardImage1.jpg",
-    "textContent": "First dilemma text goes here!"
+    "textContent": "First dilemma text goes here!",
+    "leftPlaceholderImage": "/assets/logo1.png",
+    "leftPlaceholderText": "Left placeholder text 1",
+    "rightPlaceholderImage": "/assets/hardImage2.jpg",
+    "rightPlaceholderText": "Right placeholder text 1"
   },
   {
     "imagePath": "/assets/hardImage2.jpg",
-    "textContent": "Second dilemma text goes here!"
+    "textContent": "Second dilemma text goes here!",
+    "leftPlaceholderImage": "/assets/hardImage1.jpg",
+    "leftPlaceholderText": "Left placeholder text 2",
+    "rightPlaceholderImage": "/assets/logo1.png",
+    "rightPlaceholderText": "Right placeholder text 2"
   },
   {
     "imagePath": "/assets/logo1.png",
-    "textContent": "Third dilemma text goes here!"
+    "textContent": "Third dilemma text goes here!",
+    "leftPlaceholderImage": "/assets/hardImage2.jpg",
+    "leftPlaceholderText": "Left placeholder text 3",
+    "rightPlaceholderImage": "/assets/hardImage1.jpg",
+    "rightPlaceholderText": "Right placeholder text 3"
   }
 ]

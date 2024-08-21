@@ -1,1 +1,28 @@
-.place-holder {}
+.place-holder {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #4e4e4e;
+    border-radius: 12px;
+    overflow: hidden;
+    color: #777;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.placeholder-image {
+    height: 75%;
+}
+
+.placeholder-image img {
+    width: 100%;
+    height: 100%;
+  }
+
+.placeholder-text {
+    color: #cecece;
+    font-size: 16px;
+    margin: 8px;
+}

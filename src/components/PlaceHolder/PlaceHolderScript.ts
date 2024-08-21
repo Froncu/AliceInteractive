@@ -1,8 +1,15 @@
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'PlaceHolder',
-  setup() {
-    return;
+  props: {
+    image: {
+      type: String as PropType<string>,
+      default: ''
+    },
+    text: {
+      type: String as PropType<string>,
+      default: ''
+    }
   }
 });

@@ -18,8 +18,8 @@
   border-radius: 12px;
   top: 50%;
   left: 25%;
-  transform: translate(-50%, -50%) rotate(-4deg);
   z-index: 0;
+  transform: translate(-50%, -50%) rotate(-4deg);
   transform-origin: 50% 50%; /* Ensure rotation is around the visual center */
 }
 

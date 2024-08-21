@@ -65,7 +65,7 @@ export default defineComponent({
     const handleMouseUp = () => {
       if (isDragging.value) {
         isDragging.value = false;
-    
+
         const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
         let droppedPlaceholder = null;
 
@@ -73,7 +73,7 @@ export default defineComponent({
           const placeholderRect = placeholder.getBoundingClientRect();
           if (cardElement.value) {
             const cardRect = cardElement.value.getBoundingClientRect();
-    
+
             if (cardRect.left < placeholderRect.right &&
               cardRect.right > placeholderRect.left &&
               cardRect.top < placeholderRect.bottom &&
@@ -86,19 +86,18 @@ export default defineComponent({
             }
           }
         });
-    
-        if (droppedPlaceholder) {
+
+        if (droppedPlaceholder)
           emit('card-dropped', droppedPlaceholder);
-        } else {
-          if (cardElement.value) {
-            cardElement.value.style.left = '50%';
-            cardElement.value.style.top = '50%';
-            cardElement.value.style.transform = 'translate(-50%, -50%)';
-          }
+
+        if (cardElement.value) {
+          cardElement.value.style.left = '50%';
+          cardElement.value.style.top = '50%';
+          cardElement.value.style.transform = 'translate(-50%, -50%)';
         }
       }
     };
-    
+
 
     onMounted(() => {
       cardElement.value = document.querySelector('.dilemma-card') as HTMLElement;

@@ -1,7 +1,7 @@
 .dilemma-card {
   position: absolute;
-  width: 300px;
-  height: 400px;
+  width: 20vw;
+  height: calc(20vw * 4 / 3);
   border-radius: 12px;
   overflow: hidden;
   cursor: move;
@@ -24,8 +24,7 @@
 .dilemma-text {
   position: relative;
   color: #cecece;
-  font-size: 16px;
-  margin: 8px;
+  font-size: 1.25vw;
   text-align: center;
   font-family: Arial, sans-serif;
 }

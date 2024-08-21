@@ -1,7 +1,7 @@
 .place-holder {
     position: absolute;
-    width: 316px;
-    height: 416px;
+    width: 21vw;
+    height: calc(21vw * 4 / 3);
     border-radius: 12px;
     overflow: hidden;
     cursor: auto;
@@ -24,8 +24,7 @@
 .placeholder-text {
     position: relative;
     color: #cecece;
-    font-size: 16px;
-    margin: 8px;
+    font-size: 1.25vw;
     text-align: center;
     font-family: Arial, sans-serif;
 }

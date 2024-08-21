@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import DilemmaCard from '@/components/DilemmaCard/DilemmaCard.vue';
 import PlaceHolder from '@/components/PlaceHolder/PlaceHolder.vue';
 
@@ -61,13 +61,6 @@ export default defineComponent({
     };
 
     const handleCardDropped = (placeholder: { image: string | undefined, text: string }) => {
-      const cardElement = document.querySelector('.dilemma-card') as HTMLElement;
-      if (cardElement) {
-        cardElement.style.left = '50%';
-        cardElement.style.top = '50%';
-        cardElement.style.transform = 'translate(-50%, -50%)';
-      }
-
       if (imagePath.value !== undefined) {
         answers.value.push({
           cardImage: imagePath.value,

@@ -31,18 +31,34 @@ export default defineComponent({
           const leftPlaceholder = placeholders[0] as HTMLElement;
           const rightPlaceholder = placeholders[1] as HTMLElement;
     
-          const leftRotation = parseFloat(window.getComputedStyle(leftPlaceholder).rotate);
-          const rightRotation = parseFloat(window.getComputedStyle(rightPlaceholder).rotate);
+          // Function to extract the rotation angle from the transform property
+          const getRotationAngle = (element: HTMLElement): number => {
+            const transform = window.getComputedStyle(element).transform;
+          
+            if (transform === 'none') return 0;
+          
+            // Create a matrix from the transform string
+            const matrix = new DOMMatrix(transform);
+          
+            // Calculate the rotation angle in degrees
+            const angle = Math.atan2(matrix.m21, matrix.m11) * (-180 / Math.PI);
+          
+            return angle;
+          };
+          
+    
+          const leftRotation = getRotationAngle(leftPlaceholder);
+          const rightRotation = getRotationAngle(rightPlaceholder);
     
           const leftPlaceholderRect = leftPlaceholder.getBoundingClientRect();
           const leftCenterX = leftPlaceholderRect.left + leftPlaceholderRect.width / 2;
-
+    
           const rightPlaceholderRect = rightPlaceholder.getBoundingClientRect();
           const rightCenterX = rightPlaceholderRect.left + rightPlaceholderRect.width / 2;
-          
+    
           const cardRect = cardElement.value.getBoundingClientRect();
           const cardCenterX = cardRect.left + cardRect.width / 2;
-          
+    
           const distanceFromLeft = cardCenterX - leftCenterX;
           const totalDistance = rightCenterX - leftCenterX;
           const progress = distanceFromLeft / totalDistance;
@@ -53,6 +69,7 @@ export default defineComponent({
         }
       }
     };
+    
 
     const handleMouseUp = () => {
       if (isDragging.value) {

@@ -2,7 +2,7 @@
     position: absolute;
     width: 21vw;
     height: calc(21vw * 4 / 3);
-    border-radius: 12px;
+    border-radius: 4%;
     overflow: hidden;
     cursor: auto;
     background-color: white;

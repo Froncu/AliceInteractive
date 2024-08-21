@@ -8,17 +8,20 @@ export default defineComponent({
     const offset = ref({ x: 0, y: 0 });
     const cardElement = ref<HTMLElement | null>(null);
 
-    const handleMouseDown = (event: MouseEvent) => {
-      if (event.button === 0) {
-        isDragging.value = true;
-        if (cardElement.value) {
-          cardElement.value.classList.add('no-transition'); // Disable transition
-        }
-        const rect = cardElement.value?.getBoundingClientRect();
-        if (rect) {
-          offset.value = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-          event.preventDefault();
-        }
+    const handleStart = (event: MouseEvent | TouchEvent) => {
+      if (event instanceof MouseEvent && event.button !== 0) return;
+
+      isDragging.value = true;
+      if (cardElement.value) {
+        cardElement.value.classList.add('no-transition'); // Disable transition
+      }
+      
+      const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+      const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+      const rect = cardElement.value?.getBoundingClientRect();
+      if (rect) {
+        offset.value = { x: clientX - rect.left, y: clientY - rect.top };
+        event.preventDefault();
       }
     };
 
@@ -30,8 +33,11 @@ export default defineComponent({
       return Math.atan2(matrix.m21, matrix.m11) * (-180 / Math.PI);
     };
 
-    const handleMouseMove = (event: MouseEvent) => {
+    const handleMove = (event: MouseEvent | TouchEvent) => {
       if (isDragging.value && cardElement.value) {
+        const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+        const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+
         const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
         if (placeholders.length === 2) {
           const [leftPlaceholder, rightPlaceholder] = placeholders;
@@ -57,13 +63,12 @@ export default defineComponent({
           cardElement.value.style.transform = `rotate(${interpolatedRotation}deg)`;
         }
 
-        const { clientX, clientY } = event;
         cardElement.value.style.left = `${clientX - offset.value.x}px`;
         cardElement.value.style.top = `${clientY - offset.value.y}px`;
       }
     };
 
-    const handleMouseUp = () => {
+    const handleEnd = (event: MouseEvent | TouchEvent) => {
       if (isDragging.value) {
         isDragging.value = false;
         if (cardElement.value) {
@@ -135,25 +140,44 @@ export default defineComponent({
       }
     };
 
+    const addEventListeners = () => {
+      window.addEventListener('mousemove', handleMove);
+      window.addEventListener('mouseup', handleEnd);
+      window.addEventListener('touchmove', handleMove, { passive: false });
+      window.addEventListener('touchend', handleEnd);
+    };
+
+    const removeEventListeners = () => {
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleEnd);
+      window.removeEventListener('touchmove', handleMove);
+      window.removeEventListener('touchend', handleEnd);
+    };
+
     onMounted(() => {
       cardElement.value = document.querySelector('.dilemma-card') as HTMLElement;
       if (cardElement.value) {
         cardElement.value.style.left = '50%';
         cardElement.value.style.top = '50%';
         cardElement.value.style.transform = 'translate(-50%, -50%)';
+        cardElement.value.addEventListener('mousedown', handleStart);
+        cardElement.value.addEventListener('touchstart', handleStart, { passive: false });
       }
 
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      addEventListeners();
     });
 
     onUnmounted(() => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      if (cardElement.value) {
+        cardElement.value.removeEventListener('mousedown', handleStart);
+        cardElement.value.removeEventListener('touchstart', handleStart);
+      }
+
+      removeEventListeners();
     });
 
     return {
-      handleMouseDown,
+      handleMouseDown: handleStart,
       cardElement
     };
   }

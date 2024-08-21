@@ -6,11 +6,11 @@
   /* Center the card */
   width: 300px;
   height: 400px;
-  border: 2px solid #000000;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: move;
   z-index: 1;
+  background-color: white;
 }
 
 .image-container {

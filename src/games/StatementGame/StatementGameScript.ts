@@ -1,12 +1,10 @@
 import { defineComponent, ref, onMounted } from 'vue';
 import DilemmaCard from '@/components/DilemmaCard/DilemmaCard.vue';
-import PlaceHolder from '@/components/PlaceHolder/PlaceHolder.vue';
 
 export default defineComponent({
   name: 'StatementGame',
   components: {
-    DilemmaCard,
-    PlaceHolder
+    DilemmaCard
   },
   setup() {
     const cardData = ref<{ imagePath: string; textContent: string }[]>([]);

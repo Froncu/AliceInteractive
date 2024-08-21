@@ -64,6 +64,20 @@ export default defineComponent({
 
     onMounted(() => {
       fetchData();
+
+      const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
+      
+      if (placeholders.length === 2) {
+        const [leftPlaceholder, rightPlaceholder] = placeholders;
+
+        leftPlaceholder.style.top = '50%';
+        leftPlaceholder.style.left = '25%';
+        leftPlaceholder.style.transform = 'translate(-50%, -50%) rotate(-6deg)';
+
+        rightPlaceholder.style.top = '50%';
+        rightPlaceholder.style.left = '75%';
+        rightPlaceholder.style.transform = 'translate(-50%, -50%) rotate(6deg)';
+      }
     });
 
     return {

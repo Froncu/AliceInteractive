@@ -30,9 +30,13 @@
 }
 
 .dilemma-text {
-  position: relative;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
   color: #cecece;
   font-size: 1.25vw;
   text-align: center;
+  align-items: center;
   font-family: Arial, sans-serif;
+  background: rgba(0, 0, 0, 0.65);
 }

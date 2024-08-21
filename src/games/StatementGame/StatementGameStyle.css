@@ -6,4 +6,5 @@
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
+  z-index: 0;
 }

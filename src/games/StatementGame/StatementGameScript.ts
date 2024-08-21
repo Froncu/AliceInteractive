@@ -1,21 +1,23 @@
 import { defineComponent, ref, onMounted } from 'vue';
 import DilemmaCard from '@/components/DilemmaCard/DilemmaCard.vue';
 import PlaceHolder from '@/components/PlaceHolder/PlaceHolder.vue';
+import ChoiceTimer from '@/components/ChoiceTimer/ChoiceTimer.vue';
 
 export default defineComponent({
   name: 'StatementGame',
   components: {
     DilemmaCard,
-    PlaceHolder
+    PlaceHolder,
+    ChoiceTimer
   },
   setup() {
-    const cardData = ref<{ 
-      imagePath: string; 
-      textContent: string; 
-      leftPlaceholderImage: string; 
-      leftPlaceholderText: string; 
-      rightPlaceholderImage: string; 
-      rightPlaceholderText: string; 
+    const cardData = ref<{
+      imagePath: string;
+      textContent: string;
+      leftPlaceholderImage: string;
+      leftPlaceholderText: string;
+      rightPlaceholderImage: string;
+      rightPlaceholderText: string;
     }[]>([]);
     const currentIndex = ref<number>(0);
     const imagePath = ref<string | undefined>(undefined);
@@ -25,12 +27,14 @@ export default defineComponent({
     const rightPlaceholderImage = ref<string | undefined>(undefined);
     const rightPlaceholderText = ref<string | undefined>(undefined);
 
-    const answers = ref<{ 
-      cardImage: string | undefined; 
-      cardText: string; 
-      placeholderImage: string | undefined; 
-      placeholderText: string; 
+    const answers = ref<{
+      cardImage: string | undefined;
+      cardText: string;
+      placeholderImage: string | undefined;
+      placeholderText: string;
     }[]>([]);
+
+    const choiceTimer = ref<{ resetTimer: () => void } | null>(null);
 
     const fetchData = async () => {
       try {
@@ -45,6 +49,10 @@ export default defineComponent({
     };
 
     const loadNextCard = () => {
+      if (choiceTimer.value) {
+        choiceTimer.value.resetTimer();
+      }
+
       if (currentIndex.value < cardData.value.length) {
         const currentCard = cardData.value[currentIndex.value];
         imagePath.value = currentCard.imagePath;
@@ -86,7 +94,7 @@ export default defineComponent({
     onMounted(() => {
       fetchData();
       const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
-      
+
       if (placeholders.length === 2) {
         const [leftPlaceholder, rightPlaceholder] = placeholders;
 
@@ -107,7 +115,8 @@ export default defineComponent({
       leftPlaceholderText,
       rightPlaceholderImage,
       rightPlaceholderText,
-      handleCardDropped
+      handleCardDropped,
+      choiceTimer
     };
   }
 });

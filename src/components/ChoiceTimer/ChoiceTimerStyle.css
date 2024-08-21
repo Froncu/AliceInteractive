@@ -1,0 +1,18 @@
+.choice-timer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(125, 125, 125, 0.5);
+  font-size: 120vh;
+  text-align: center;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif, monospace;
+  font-variant-numeric: tabular-nums;
+}

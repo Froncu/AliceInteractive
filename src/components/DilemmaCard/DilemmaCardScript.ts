@@ -2,8 +2,8 @@ import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 
 export default defineComponent({
   name: 'DilemmaCard',
-  emits: ['mouse-move'],
-  setup() {
+  emits: ['card-dropped'],
+  setup(_, { emit }) {
     const isDragging = ref(false);
     const offset = ref({ x: 0, y: 0 });
     const cardElement = ref<HTMLElement | null>(null);
@@ -80,6 +80,9 @@ export default defineComponent({
               const placeholderRotation = window.getComputedStyle(placeholder).rotate || '0deg';
               cardElement.value.style.transform = `translate(-50%, -50%) rotate(${placeholderRotation})`;
               snapped = true;
+
+              // Emit the 'card-dropped' event
+              emit('card-dropped');
             }
           }
         });
@@ -91,7 +94,6 @@ export default defineComponent({
         }
       }
     };
-    
 
     onMounted(() => {
       cardElement.value = document.querySelector('.dilemma-card') as HTMLElement;

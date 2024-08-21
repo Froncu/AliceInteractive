@@ -1,5 +1,5 @@
 <div class="statement-game">
-  <DilemmaCard @mouse-move="updateImagePosition">
+  <DilemmaCard @mouse-move="updateImagePosition" @card-dropped="handleCardDropped">
     <template #image>
       <img :src="imagePath" />
     </template>

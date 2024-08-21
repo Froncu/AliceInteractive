@@ -1,4 +1,14 @@
-{
-  "imagePath": "/assets/hardImage2.jpg",
-  "textContent": "Text goes here! Text goes here!Text goes here!Text goes here!"
-}
+[
+  {
+    "imagePath": "/assets/hardImage1.jpg",
+    "textContent": "First dilemma text goes here!"
+  },
+  {
+    "imagePath": "/assets/hardImage2.jpg",
+    "textContent": "Second dilemma text goes here!"
+  },
+  {
+    "imagePath": "/assets/logo1.png",
+    "textContent": "Third dilemma text goes here!"
+  }
+]

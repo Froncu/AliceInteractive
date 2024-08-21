@@ -7,6 +7,14 @@
   cursor: move;
   background-color: white;
   z-index: 1;
+  transition: 
+    left 0.3s ease, 
+    top 0.3s ease, 
+    transform 0.3s ease, 
+}
+
+.dilemma-card.no-transition {
+  transition: none; /* Disable transition while dragging */
 }
 
 .dilemma-image {

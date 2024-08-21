@@ -21,11 +21,6 @@ export default defineComponent({
 
     const handleMouseMove = (event: MouseEvent) => {
       if (isDragging.value && cardElement.value) {
-        const { clientX, clientY } = event;
-
-        cardElement.value.style.left = `${clientX - offset.value.x}px`;
-        cardElement.value.style.top = `${clientY - offset.value.y}px`;
-
         const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
         if (placeholders.length === 2) {
           const [leftPlaceholder, rightPlaceholder] = placeholders;
@@ -59,6 +54,10 @@ export default defineComponent({
 
           cardElement.value.style.transform = `rotate(${interpolatedRotation}deg)`;
         }
+        
+        const { clientX, clientY } = event;
+        cardElement.value.style.left = `${clientX - offset.value.x}px`;
+        cardElement.value.style.top = `${clientY - offset.value.y}px`;
       }
     };
 

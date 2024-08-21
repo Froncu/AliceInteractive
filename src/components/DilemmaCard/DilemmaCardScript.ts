@@ -3,7 +3,7 @@ import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 export default defineComponent({
   name: 'DilemmaCard',
   emits: ['mouse-move'],
-  setup(props, { emit }) {
+  setup() {
     const isDragging = ref(false);
     const offset = ref({ x: 0, y: 0 });
     const cardElement = ref<HTMLElement | null>(null);
@@ -23,44 +23,34 @@ export default defineComponent({
       if (isDragging.value && cardElement.value) {
         const { clientX, clientY } = event;
     
-        // Update card position based on the mouse movement
         cardElement.value.style.left = `${clientX - offset.value.x}px`;
         cardElement.value.style.top = `${clientY - offset.value.y}px`;
     
-        // Fetch rotation values from placeholders
         const placeholders = document.querySelectorAll('.place-holder-left, .place-holder-right');
         if (placeholders.length === 2) {
           const leftPlaceholder = placeholders[0] as HTMLElement;
           const rightPlaceholder = placeholders[1] as HTMLElement;
     
-          const leftRotation = parseFloat(window.getComputedStyle(leftPlaceholder).rotate) || -2;
-          const rightRotation = parseFloat(window.getComputedStyle(rightPlaceholder).rotate) || 5;
+          const leftRotation = parseFloat(window.getComputedStyle(leftPlaceholder).rotate);
+          const rightRotation = parseFloat(window.getComputedStyle(rightPlaceholder).rotate);
     
           const leftPlaceholderRect = leftPlaceholder.getBoundingClientRect();
+          const leftCenterX = leftPlaceholderRect.left + leftPlaceholderRect.width / 2;
+
           const rightPlaceholderRect = rightPlaceholder.getBoundingClientRect();
+          const rightCenterX = rightPlaceholderRect.left + rightPlaceholderRect.width / 2;
           
           const cardRect = cardElement.value.getBoundingClientRect();
           const cardCenterX = cardRect.left + cardRect.width / 2;
-    
-          const leftCenterX = leftPlaceholderRect.left + leftPlaceholderRect.width / 2;
-          const rightCenterX = rightPlaceholderRect.left + rightPlaceholderRect.width / 2;
-    
-          // Calculate the distance of the card from the left and right placeholders
-          const totalDistance = rightCenterX - leftCenterX;
+          
           const distanceFromLeft = cardCenterX - leftCenterX;
+          const totalDistance = rightCenterX - leftCenterX;
           const progress = distanceFromLeft / totalDistance;
     
-          // Interpolate the rotation
           const interpolatedRotation = leftRotation + (rightRotation - leftRotation) * progress;
     
-          // Apply the rotation
           cardElement.value.style.transform = `translate(-50%, -50%) rotate(${interpolatedRotation}deg)`;
         }
-    
-        emit('mouse-move', {
-          x: clientX,
-          y: clientY
-        });
       }
     };
 
@@ -76,7 +66,7 @@ export default defineComponent({
           if (cardElement.value) {
             const cardRect = cardElement.value.getBoundingClientRect();
     
-            if (
+            if (!snapped &&
               cardRect.left < placeholderRect.right &&
               cardRect.right > placeholderRect.left &&
               cardRect.top < placeholderRect.bottom &&
@@ -95,10 +85,9 @@ export default defineComponent({
         });
     
         if (!snapped && cardElement.value) {
-          // Snap back to the center
           cardElement.value.style.left = `50%`;
           cardElement.value.style.top = `50%`;
-          cardElement.value.style.transform = `translate(-50%, -50%)`; // Reset rotation
+          cardElement.value.style.transform = `translate(-50%, -50%)`;
         }
       }
     };

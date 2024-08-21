@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import DilemmaCard from '@/components/DilemmaCard/DilemmaCard.vue';
 import PlaceHolder from '@/components/PlaceHolder/PlaceHolder.vue';
 
@@ -25,6 +25,13 @@ export default defineComponent({
     const rightPlaceholderImage = ref<string | undefined>(undefined);
     const rightPlaceholderText = ref<string | undefined>(undefined);
 
+    const answers = ref<{ 
+      cardImage: string | undefined; 
+      cardText: string; 
+      placeholderImage: string | undefined; 
+      placeholderText: string; 
+    }[]>([]);
+
     const fetchData = async () => {
       try {
         const response = await fetch('/assets/cardData.json');
@@ -49,22 +56,42 @@ export default defineComponent({
         currentIndex.value++;
       } else {
         textContent.value = 'No more cards!';
+        saveAnswersToFile();
       }
     };
 
-    const handleCardDropped = () => {
-      loadNextCard();
+    const handleCardDropped = (placeholder: { image: string | undefined, text: string }) => {
       const cardElement = document.querySelector('.dilemma-card') as HTMLElement;
       if (cardElement) {
         cardElement.style.left = '50%';
         cardElement.style.top = '50%';
         cardElement.style.transform = 'translate(-50%, -50%)';
       }
+
+      if (imagePath.value !== undefined) {
+        answers.value.push({
+          cardImage: imagePath.value,
+          cardText: textContent.value,
+          placeholderImage: placeholder.image,
+          placeholderText: placeholder.text
+        });
+      }
+      loadNextCard();
+    };
+
+    const saveAnswersToFile = () => {
+      const fileData = JSON.stringify(answers.value, null, 2);
+      const blob = new Blob([fileData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'answers.json';
+      a.click();
+      URL.revokeObjectURL(url);
     };
 
     onMounted(() => {
       fetchData();
-
       const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
       
       if (placeholders.length === 2) {

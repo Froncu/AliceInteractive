@@ -30,7 +30,6 @@ export default defineComponent({
         if (placeholders.length === 2) {
           const [leftPlaceholder, rightPlaceholder] = placeholders;
 
-          // Function to extract the rotation angle from the transform property
           const getRotationAngle = (element: HTMLElement): number => {
             const transform = window.getComputedStyle(element).transform;
             if (transform === 'none')
@@ -68,8 +67,8 @@ export default defineComponent({
         isDragging.value = false;
     
         const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
-        let isOverlapping = false;
-    
+        let droppedPlaceholder = null;
+
         placeholders.forEach((placeholder) => {
           const placeholderRect = placeholder.getBoundingClientRect();
           if (cardElement.value) {
@@ -80,15 +79,17 @@ export default defineComponent({
               cardRect.top < placeholderRect.bottom &&
               cardRect.bottom > placeholderRect.top
             ) {
-              isOverlapping = true;
+              droppedPlaceholder = {
+                image: placeholder.querySelector('img')?.getAttribute('src') || '',
+                text: placeholder.querySelector('p')?.textContent || ''
+              };
             }
           }
         });
     
-        if (isOverlapping) {
-          emit('card-dropped');
+        if (droppedPlaceholder) {
+          emit('card-dropped', droppedPlaceholder);
         } else {
-          // Reset the card's position if not overlapping
           if (cardElement.value) {
             cardElement.value.style.left = '50%';
             cardElement.value.style.top = '50%';
@@ -100,7 +101,7 @@ export default defineComponent({
     
 
     onMounted(() => {
-      cardElement.value = document.querySelector('.dilemma-card') as HTMLElement
+      cardElement.value = document.querySelector('.dilemma-card') as HTMLElement;
       cardElement.value.style.left = '50%';
       cardElement.value.style.top = '50%';
       cardElement.value.style.transform = 'translate(-50%, -50%)';

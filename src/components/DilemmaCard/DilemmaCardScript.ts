@@ -100,7 +100,11 @@ export default defineComponent({
     
 
     onMounted(() => {
-      cardElement.value = document.querySelector('.dilemma-card') as HTMLElement;
+      cardElement.value = document.querySelector('.dilemma-card') as HTMLElement
+      cardElement.value.style.left = '50%';
+      cardElement.value.style.top = '50%';
+      cardElement.value.style.transform = 'translate(-50%, -50%)';
+
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
     });

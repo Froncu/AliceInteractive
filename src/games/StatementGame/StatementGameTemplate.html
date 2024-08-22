@@ -7,7 +7,24 @@
       <p>{{ textContent }}</p>
     </template>
   </DilemmaCard>
-  <PlaceHolder :image="leftPlaceholderImage" :text="leftPlaceholderText" />
-  <PlaceHolder :image="rightPlaceholderImage" :text="rightPlaceholderText" />
+
+  <PlaceHolder>
+    <template #image>
+      <img :src="leftPlaceholderImage" />
+    </template>
+    <template #text>
+      <p>{{ leftPlaceholderText }}</p>
+    </template>
+  </PlaceHolder>
+
+  <PlaceHolder>
+    <template #image>
+      <img :src="rightPlaceholderImage" />
+    </template>
+    <template #text>
+      <p>{{ rightPlaceholderText }}</p>
+    </template>
+  </PlaceHolder>
+
   <ChoiceTimer ref="choiceTimer" />
 </div>

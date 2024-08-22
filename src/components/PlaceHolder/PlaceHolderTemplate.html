@@ -1,4 +1,8 @@
 <div class="place-holder">
-  <img v-if="image" :src="image" class="placeholder-image" />
-  <p v-if="text" class="placeholder-text">{{ text }}</p>
+  <div class="placeholder-image">
+    <slot name="image"></slot>
+  </div>
+  <div class="placeholder-text">
+    <slot name="text"></slot>
+  </div>
 </div>

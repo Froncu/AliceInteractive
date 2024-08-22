@@ -1,18 +1,21 @@
+@font-face {
+  font-family: "Levenim Bold";
+  src: url(/public/assets/LlevenimMTBold.ttf);
+}
+
 .choice-timer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -47.5%);
   display: flex;
-  justify-content: center;
   align-items: center;
-  color: rgba(125, 125, 125, 0.5);
-  font-size: 120vh;
+  color: rgba(125, 125, 125, 1.0);
+  font-size: min(25vW, 50vh);
   text-align: center;
   overflow: hidden;
   z-index: 1;
   pointer-events: none;
-  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif, monospace;
-  font-variant-numeric: tabular-nums;
+  font-family: "Levenim Bold";
+  color: rgba(5, 25, 11, 0.4);
 }

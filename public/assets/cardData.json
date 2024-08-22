@@ -2,9 +2,9 @@
   {
     "imagePath": "/assets/image.png",
     "textContent": "First dilemma text goes here!",
-    "leftPlaceholderImage": "/assets/image.png",
+    "leftPlaceholderImage": "/assets/thumbUp.png",
     "leftPlaceholderText": "Left placeholder text 1",
-    "rightPlaceholderImage": "/assets/image.png",
+    "rightPlaceholderImage": "/assets/thumbDown.png",
     "rightPlaceholderText": "Right placeholder text 1"
   },
   {

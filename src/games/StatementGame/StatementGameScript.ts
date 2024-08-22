@@ -98,12 +98,12 @@ export default defineComponent({
       if (placeholders.length === 2) {
         const [leftPlaceholder, rightPlaceholder] = placeholders;
 
-        leftPlaceholder.style.top = '50%';
-        leftPlaceholder.style.left = '25%';
+        leftPlaceholder.style.top = '55%';
+        leftPlaceholder.style.left = '20%';
         leftPlaceholder.style.transform = 'translate(-50%, -50%) rotate(-6deg)';
 
-        rightPlaceholder.style.top = '50%';
-        rightPlaceholder.style.left = '75%';
+        rightPlaceholder.style.top = '55%';
+        rightPlaceholder.style.left = '80%';
         rightPlaceholder.style.transform = 'translate(-50%, -50%) rotate(6deg)';
       }
     });

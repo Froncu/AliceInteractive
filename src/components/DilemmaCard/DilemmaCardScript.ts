@@ -118,7 +118,7 @@ export default defineComponent({
                 cardElement.value?.removeEventListener('transitionend', transitionEnd);
                 if (cardElement.value) {
                   cardElement.value.style.left = '50%';
-                  cardElement.value.style.top = '50%';
+                  cardElement.value.style.top = '70%';
                   cardElement.value.style.transform = 'translate(-50%, -50%)';
                 }
               }
@@ -133,7 +133,7 @@ export default defineComponent({
           // Reset card position if no placeholder was matched
           if (cardElement.value) {
             cardElement.value.style.left = '50%';
-            cardElement.value.style.top = '50%';
+            cardElement.value.style.top = '70%';
             cardElement.value.style.transform = 'translate(-50%, -50%)';
           }
         }
@@ -158,7 +158,7 @@ export default defineComponent({
       cardElement.value = document.querySelector('.dilemma-card') as HTMLElement;
       if (cardElement.value) {
         cardElement.value.style.left = '50%';
-        cardElement.value.style.top = '50%';
+        cardElement.value.style.top = '70%';
         cardElement.value.style.transform = 'translate(-50%, -50%)';
         cardElement.value.addEventListener('mousedown', handleStart);
         cardElement.value.addEventListener('touchstart', handleStart, { passive: false });

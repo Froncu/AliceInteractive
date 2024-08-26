@@ -2,183 +2,162 @@ import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 
 export default defineComponent({
   name: 'DilemmaCard',
-  emits: ['card-dropped'],
+  emits: ["choicemade"],
   setup(_, { emit }) {
-    const isDragging = ref(false);
-    const offset = ref({ x: 0, y: 0 });
+    let offset = { x: 0, y: 0 };
     const cardElement = ref<HTMLElement | null>(null);
+    function onTransitionEnd(event: TransitionEvent) {
+      if (event.propertyName === 'left' || event.propertyName === 'top' || event.propertyName === 'rotate') {
+        const placeholders = document.querySelectorAll<HTMLElement>('.place-holder');
+        const cardRect = cardElement.value?.getBoundingClientRect();
 
-    const handleStart = (event: MouseEvent | TouchEvent) => {
-      if (event instanceof MouseEvent && event.button !== 0) return;
-
-      isDragging.value = true;
-      if (cardElement.value) {
-        cardElement.value.classList.add('no-transition'); // Disable transition
-      }
-      
-      const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
-      const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
-      const rect = cardElement.value?.getBoundingClientRect();
-      if (rect) {
-        offset.value = { x: clientX - rect.left, y: clientY - rect.top };
-        event.preventDefault();
-      }
-    };
-
-    const getRotationAngle = (element: HTMLElement): number => {
-      const transform = window.getComputedStyle(element).transform;
-      if (transform === 'none') return 0;
-
-      const matrix = new DOMMatrix(transform);
-      return Math.atan2(matrix.m21, matrix.m11) * (-180 / Math.PI);
-    };
-
-    const handleMove = (event: MouseEvent | TouchEvent) => {
-      if (isDragging.value && cardElement.value) {
-        const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
-        const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
-
-        const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
-        if (placeholders.length === 2) {
-          const [leftPlaceholder, rightPlaceholder] = placeholders;
-
-          const leftRotation = getRotationAngle(leftPlaceholder);
-          const rightRotation = getRotationAngle(rightPlaceholder);
-
-          const leftPlaceholderRect = leftPlaceholder.getBoundingClientRect();
-          const leftCenterX = leftPlaceholderRect.left + leftPlaceholderRect.width / 2;
-
-          const rightPlaceholderRect = rightPlaceholder.getBoundingClientRect();
-          const rightCenterX = rightPlaceholderRect.left + rightPlaceholderRect.width / 2;
-
-          const cardRect = cardElement.value.getBoundingClientRect();
-          const cardCenterX = cardRect.left + cardRect.width / 2;
-
-          const distanceFromLeft = cardCenterX - leftCenterX;
-          const totalDistance = rightCenterX - leftCenterX;
-          const progress = distanceFromLeft / totalDistance;
-
-          const interpolatedRotation = leftRotation + (rightRotation - leftRotation) * progress;
-
-          cardElement.value.style.transform = `rotate(${interpolatedRotation}deg)`;
-        }
-
-        cardElement.value.style.left = `${clientX - offset.value.x}px`;
-        cardElement.value.style.top = `${clientY - offset.value.y}px`;
-      }
-    };
-
-    const handleEnd = (event: MouseEvent | TouchEvent) => {
-      if (isDragging.value) {
-        isDragging.value = false;
-        if (cardElement.value) {
-          cardElement.value.classList.remove('no-transition'); // Re-enable transition
-        }
-
-        const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
-        
-        let droppedPlaceholder: { image: string; text: string } | null = null;
+        const overlappingPlaceholder = ref<HTMLElement | null>(null);
         placeholders.forEach((placeholder) => {
           const placeholderRect = placeholder.getBoundingClientRect();
-          if (cardElement.value) {
-            const cardRect = cardElement.value.getBoundingClientRect();
-
-            if (cardRect.left < placeholderRect.right &&
-              cardRect.right > placeholderRect.left &&
-              cardRect.top < placeholderRect.bottom &&
-              cardRect.bottom > placeholderRect.top
-            ) {
-              droppedPlaceholder = {
-                image: placeholder.querySelector('img')?.getAttribute('src') || '',
-                text: placeholder.querySelector('p')?.textContent || ''
-              };
-
-              const placeholderCenterX = placeholderRect.left + placeholderRect.width / 2;
-              const placeholderCenterY = placeholderRect.top + placeholderRect.height / 2;
-              const placeholderRotation = getRotationAngle(placeholder);
-
-              // Calculate the center position of the card
-              const cardRect = cardElement.value.getBoundingClientRect();
-              const cardWidth = cardRect.width;
-              const cardHeight = cardRect.height;
-              const cardCenterX = cardRect.left + cardWidth / 2;
-              const cardCenterY = cardRect.top + cardHeight / 2;
-
-              // Calculate the translation offset
-              const translateX = placeholderCenterX - cardCenterX;
-              const translateY = placeholderCenterY - cardCenterY;
-
-              // Apply the position and rotation with transition
-              cardElement.value.style.transition = 'transform 0.5s ease, left 0.5s ease, top 0.5s ease';
-              cardElement.value.style.transform = `translate(${translateX}px, ${translateY}px) rotate(${placeholderRotation}deg)`;
-
-              const transitionEnd = () => {
-                cardElement.value?.style.removeProperty('transition');
-                emit('card-dropped', droppedPlaceholder);
-                cardElement.value?.removeEventListener('transitionend', transitionEnd);
-                if (cardElement.value) {
-                  cardElement.value.style.left = '50%';
-                  cardElement.value.style.top = '70%';
-                  cardElement.value.style.transform = 'translate(-50%, -50%)';
-                }
-              }
-
-              // Optionally remove the transition class after the animation ends
-              cardElement.value.addEventListener('transitionend', transitionEnd);
-            }
+          if (cardRect &&
+            cardRect.left < placeholderRect.right &&
+            cardRect.right > placeholderRect.left &&
+            cardRect.top < placeholderRect.bottom &&
+            cardRect.bottom > placeholderRect.top) {
+            overlappingPlaceholder.value = placeholder;
+            return;
           }
         });
 
-        if (!droppedPlaceholder) {
-          // Reset card position if no placeholder was matched
-          if (cardElement.value) {
-            cardElement.value.style.left = '50%';
-            cardElement.value.style.top = '70%';
-            cardElement.value.style.transform = 'translate(-50%, -50%)';
-          }
+        if (overlappingPlaceholder.value) {
+          const imgElement = overlappingPlaceholder.value.querySelector("img");
+          const pElement = overlappingPlaceholder.value.querySelector("p");
+          const droppedInfo = {
+            image: imgElement?.getAttribute('src') || '',
+            text: pElement?.textContent || ''
+          };
+          
+          emit("choicemade", droppedInfo);
+
+          if (!cardElement.value)
+            return;
+          
+          cardElement.value.style.left = '50%';
+          cardElement.value.style.top = '70%';
+          cardElement.value.style.rotate = '';
         }
+
+        if (cardElement.value)
+          cardElement.value.removeEventListener('transitionend', onTransitionEnd);
       }
-    };
+    }
 
-    const addEventListeners = () => {
-      window.addEventListener('mousemove', handleMove);
-      window.addEventListener('mouseup', handleEnd);
-      window.addEventListener('touchmove', handleMove, { passive: false });
-      window.addEventListener('touchend', handleEnd);
-    };
+    function grab(event: MouseEvent | TouchEvent) {
+      event.preventDefault();
 
-    const removeEventListeners = () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseup', handleEnd);
-      window.removeEventListener('touchmove', handleMove);
-      window.removeEventListener('touchend', handleEnd);
-    };
+      if (event instanceof MouseEvent && event.button !== 0 || !cardElement.value)
+        return;
+
+      const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+      const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+      const centerX = parseInt(window.getComputedStyle(cardElement.value).left);
+      const centerY = parseInt(window.getComputedStyle(cardElement.value).top);
+      offset = { x: clientX - centerX, y: clientY - centerY };
+
+      window.addEventListener('mousemove', drag);
+      window.addEventListener('touchmove', drag);
+      cardElement.value.style.transition = "none";
+
+      cardElement.value.removeEventListener('transitionend', onTransitionEnd);
+
+      drag(event);
+    }
+
+    function drag(event: MouseEvent | TouchEvent) {
+      if (!cardElement.value)
+        return;
+
+      const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+      const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+      cardElement.value.style.left = `${clientX - offset.x}px`;
+      cardElement.value.style.top = `${clientY - offset.y}px`;
+
+      const placeholders = document.querySelectorAll<HTMLElement>('.place-holder');
+      if (placeholders.length !== 2)
+        return;
+
+      const [leftPlaceholder, rightPlaceholder] = placeholders;
+
+      const leftRotation = parseFloat(leftPlaceholder.style.rotate);
+      const rightRotation = parseFloat(rightPlaceholder.style.rotate);
+
+      const cardCenterX = parseInt(window.getComputedStyle(cardElement.value).left);
+      const leftCenterX = parseInt(window.getComputedStyle(leftPlaceholder).left);
+      const rightCenterX = parseInt(window.getComputedStyle(rightPlaceholder).left);
+
+      const distanceFromLeft = cardCenterX - leftCenterX;
+      const totalDistance = rightCenterX - leftCenterX;
+      const progress = distanceFromLeft / totalDistance;
+
+      const interpolatedRotation = leftRotation + (rightRotation - leftRotation) * progress;
+      cardElement.value.style.rotate = `${interpolatedRotation}deg`;
+    }
+
+    function release() {
+      if (!cardElement.value)
+        return;
+
+      const placeholders = document.querySelectorAll<HTMLElement>('.place-holder');
+      const cardRect = cardElement.value.getBoundingClientRect();
+      const overlappingPlaceholder = ref<HTMLElement | null>(null);
+      placeholders.forEach((placeholder) => {
+        const placeholderRect = placeholder.getBoundingClientRect();
+
+        if (cardRect.left < placeholderRect.right &&
+          cardRect.right > placeholderRect.left &&
+          cardRect.top < placeholderRect.bottom &&
+          cardRect.bottom > placeholderRect.top) {
+          overlappingPlaceholder.value = placeholder;
+          return;
+        }
+      });
+
+      if (overlappingPlaceholder.value) {
+        cardElement.value.style.left = overlappingPlaceholder.value.style.left;
+        cardElement.value.style.top = overlappingPlaceholder.value.style.top;
+
+        const placeholderRotation = parseFloat(overlappingPlaceholder.value.style.rotate);
+        cardElement.value.style.rotate = `${placeholderRotation}deg`;
+      }
+      else {
+        cardElement.value.style.left = '50%';
+        cardElement.value.style.top = '70%';
+        cardElement.value.style.rotate = '';
+      }
+
+      cardElement.value.style.transition = "rotate 0.5s ease, left 0.5s ease, top 0.5s ease";
+      cardElement.value.addEventListener('transitionend', onTransitionEnd);
+
+      window.removeEventListener('mousemove', drag);
+      window.removeEventListener('touchmove', drag);
+    }
 
     onMounted(() => {
-      cardElement.value = document.querySelector('.dilemma-card') as HTMLElement;
+      cardElement.value = document.querySelector<HTMLElement>('.dilemma-card');
       if (cardElement.value) {
         cardElement.value.style.left = '50%';
         cardElement.value.style.top = '70%';
-        cardElement.value.style.transform = 'translate(-50%, -50%)';
-        cardElement.value.addEventListener('mousedown', handleStart);
-        cardElement.value.addEventListener('touchstart', handleStart, { passive: false });
+        cardElement.value.style.rotate = '';
       }
-
-      addEventListeners();
+      window.addEventListener('mouseup', release);
+      window.addEventListener('touchend', release);
     });
 
     onUnmounted(() => {
-      if (cardElement.value) {
-        cardElement.value.removeEventListener('mousedown', handleStart);
-        cardElement.value.removeEventListener('touchstart', handleStart);
-      }
+      window.removeEventListener('mouseup', release);
+      window.removeEventListener('touchend', release);
 
-      removeEventListeners();
+      if (cardElement.value)
+        cardElement.value.removeEventListener('transitionend', onTransitionEnd);
     });
 
     return {
-      handleMouseDown: handleStart,
-      cardElement
+      grab
     };
   }
 });

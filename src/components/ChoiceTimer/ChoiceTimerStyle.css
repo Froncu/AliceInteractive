@@ -1,13 +1,8 @@
-@font-face {
-  font-family: "Levenim Bold";
-  src: url(/public/assets/LlevenimMTBold.ttf);
-}
-
 .choice-timer {
   position: absolute;
   top: 20%;
   left: 50%;
-  transform: translate(-50%, -47.5%);
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   color: rgba(125, 125, 125, 1.0);
@@ -16,6 +11,6 @@
   overflow: hidden;
   z-index: 1;
   pointer-events: none;
-  font-family: "Levenim Bold";
+  font-family: "Century Gothic";
   color: rgba(5, 25, 11, 0.4);
 }

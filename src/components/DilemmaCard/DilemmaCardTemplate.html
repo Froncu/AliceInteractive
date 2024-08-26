@@ -1,8 +1,8 @@
-<div class="dilemma-card" @mousedown="handleMouseDown">
+<div class="dilemma-card" @mousedown="grab" @touchstart="grab">
   <div class="dilemma-image">
-    <slot name="image">Default Image</slot>
+    <slot name="image">Dilemma card image</slot>
   </div>
   <div class="dilemma-text">
-    <slot name="text">Default Text</slot>
+    <slot name="text">Dilemma card statement</slot>
   </div>
 </div>

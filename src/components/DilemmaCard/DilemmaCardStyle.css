@@ -6,15 +6,8 @@
   cursor: move;
   background-color: rgba(5, 25, 11, 0.3);
   z-index: 3;
-  transition:
-    left 0.3s ease,
-    top 0.3s ease,
-    transform 0.3s ease;
   box-shadow: 0.75vw calc(0.5vw * 4 / 3) 1px 1px rgba(5, 25, 11, 0.3);
-}
-
-.dilemma-card.no-transition {
-  transition: none;
+  translate: -50% -50%;
 }
 
 .dilemma-image {
@@ -31,7 +24,7 @@
 .dilemma-text {
   position: relative;
   font-size: 1.25vw;
-  font-family: "Levenim Bold";
+  font-family: "Century Gothic";
   top: 4%;
   height: 30%;
   background-color: whitesmoke;

@@ -11,14 +11,15 @@ export default defineComponent({
     ChoiceTimer
   },
   setup() {
-    const cardData = ref<{
+    let cardData: {
       imagePath: string;
       textContent: string;
       leftPlaceholderImage: string;
       leftPlaceholderText: string;
       rightPlaceholderImage: string;
       rightPlaceholderText: string;
-    }[]>([]);
+    }[] = [];
+
     const currentIndex = ref<number>(0);
     const imagePath = ref<string | undefined>(undefined);
     const textContent = ref<string>('Loading...');
@@ -27,20 +28,22 @@ export default defineComponent({
     const rightPlaceholderImage = ref<string | undefined>(undefined);
     const rightPlaceholderText = ref<string | undefined>(undefined);
 
-    const answers = ref<{
-      cardImage: string | undefined;
-      cardText: string;
-      placeholderImage: string | undefined;
-      placeholderText: string;
-    }[]>([]);
+    const answers: {
+      givenImageSource: string | undefined;
+      givenText: string;
+      chosenImageSource: string | undefined;
+      chosenText: string;
+      secondsTaken: number;
+    }[] = [];
 
     const choiceTimer = ref<{ resetTimer: () => void } | null>(null);
+    const startTime = ref<number | null>(null);
 
     const fetchData = async () => {
       try {
-        const response = await fetch('/assets/cardData.json');
+        const response = await fetch('/assets/StatementGame/cardData.json');
         const data = await response.json();
-        cardData.value = data;
+        cardData = data;
         loadNextCard();
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -53,14 +56,15 @@ export default defineComponent({
         choiceTimer.value.resetTimer();
       }
 
-      if (currentIndex.value < cardData.value.length) {
-        const currentCard = cardData.value[currentIndex.value];
+      if (currentIndex.value < cardData.length) {
+        const currentCard = cardData[currentIndex.value];
         imagePath.value = currentCard.imagePath;
         textContent.value = currentCard.textContent;
         leftPlaceholderImage.value = currentCard.leftPlaceholderImage;
         leftPlaceholderText.value = currentCard.leftPlaceholderText;
         rightPlaceholderImage.value = currentCard.rightPlaceholderImage;
         rightPlaceholderText.value = currentCard.rightPlaceholderText;
+        startTime.value = Date.now(); // Track the start time
         currentIndex.value++;
       } else {
         textContent.value = 'No more cards!';
@@ -68,20 +72,22 @@ export default defineComponent({
       }
     };
 
-    const handleCardDropped = (placeholder: { image: string | undefined, text: string }) => {
-      if (imagePath.value !== undefined) {
-        answers.value.push({
-          cardImage: imagePath.value,
-          cardText: textContent.value,
-          placeholderImage: placeholder.image,
-          placeholderText: placeholder.text
+    function onChoiceMade(placeholder: { image: string | undefined, text: string }){
+      if (imagePath.value !== undefined && startTime.value !== null) {
+        const secondsTaken = (Date.now() - startTime.value) / 1000; // Calculate time taken in seconds
+        answers.push({
+          givenImageSource: imagePath.value,
+          givenText: textContent.value,
+          chosenImageSource: placeholder.image,
+          chosenText: placeholder.text,
+          secondsTaken
         });
       }
       loadNextCard();
-    };
+    }
 
     const saveAnswersToFile = () => {
-      const fileData = JSON.stringify(answers.value, null, 2);
+      const fileData = JSON.stringify(answers, null, 2);
       const blob = new Blob([fileData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -89,6 +95,19 @@ export default defineComponent({
       a.download = 'answers.json';
       a.click();
       URL.revokeObjectURL(url);
+    };  
+
+    const handleTimeUp = () => {
+      answers.push(
+        {
+          givenImageSource: "null",
+          givenText: "null",
+          chosenImageSource: "null",
+          chosenText: "null",
+          secondsTaken: 0
+        }
+      )
+      loadNextCard();
     };
 
     onMounted(() => {
@@ -100,11 +119,11 @@ export default defineComponent({
 
         leftPlaceholder.style.top = '55%';
         leftPlaceholder.style.left = '20%';
-        leftPlaceholder.style.transform = 'translate(-50%, -50%) rotate(-6deg)';
+        leftPlaceholder.style.rotate = '-6deg';
 
         rightPlaceholder.style.top = '55%';
         rightPlaceholder.style.left = '80%';
-        rightPlaceholder.style.transform = 'translate(-50%, -50%) rotate(6deg)';
+        rightPlaceholder.style.rotate = '6deg';
       }
     });
 
@@ -115,8 +134,9 @@ export default defineComponent({
       leftPlaceholderText,
       rightPlaceholderImage,
       rightPlaceholderText,
-      handleCardDropped,
-      choiceTimer
+      onChoiceMade,
+      choiceTimer,
+      handleTimeUp
     };
   }
 });

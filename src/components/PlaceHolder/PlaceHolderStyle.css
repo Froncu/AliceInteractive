@@ -8,6 +8,7 @@
     box-shadow: 0.75vw calc(0.5vw * 4 / 3) 1px 1px rgb(5, 25, 11, 0.3);
     pointer-events: none;
     background-color: rgba(5, 25, 11, 0.3);
+    translate: -50% -50%;
 }
 
 .placeholder-image {
@@ -24,7 +25,7 @@
 .placeholder-text {
     position: relative;
     font-size: 1.25vw;
-    font-family: "Levenim Bold";
+    font-family: "Century Gothic";
     top: 3%;
     height: 30%;
     background-color: whitesmoke;

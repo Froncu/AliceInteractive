@@ -1,5 +1,5 @@
 <div class="statement-game">
-  <DilemmaCard @mouse-move="updateImagePosition" @card-dropped="handleCardDropped">
+  <DilemmaCard @choicemade="onChoiceMade">
     <template #image>
       <img :src="imagePath" />
     </template>
@@ -26,5 +26,5 @@
     </template>
   </PlaceHolder>
 
-  <ChoiceTimer ref="choiceTimer" />
+  <ChoiceTimer ref="choiceTimer" @time-up="handleTimeUp" />
 </div>

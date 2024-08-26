@@ -12,7 +12,7 @@ export default {
   setup() {
     const router = useRouter();
     onMounted(() => {
-      router.push('/PairWiseGame');
+      router.push('mainMenu');
     });
   }
 };

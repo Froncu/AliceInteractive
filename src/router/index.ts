@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import StatementGame from '@/games/StatementGame/StatementGame.vue';
+import AssociationGame from '@/games/AssociationGame/AssociationGame.vue';
 
 const routes = [
     {
-        path: '/statementgame',
-        name: 'StatementGame',
-        component: StatementGame
+        path: '/associationgame',
+        name: 'AssociationGame',
+        component: AssociationGame
     },
     {
         path: '/',
-        redirect: '/statementgame'
+        redirect: '/associationgame'
     }
 ];
 export const router = createRouter({

@@ -1,0 +1,60 @@
+.card-item {
+  width: 20vw;
+  height: calc(20vw * (4/3));
+  background-image: url('/public/backimage.png');
+  background-size: cover;
+  border-radius: 10%;
+  box-shadow: 6px 6px 7px 7px rgba(0, 0, 0, 0.416); 
+  padding: 0.5vw;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 0;
+}
+
+.card-item .image-container {
+  height: 70%; /* Limit the image container to 70% of the card height */
+  width: 100%; /* Ensure the container is a square */
+  display: flex;
+  align-items: center; /* Center the image vertically within the container */
+  justify-content: center; /* Center the image horizontally within the container */
+  overflow: hidden; /* Hide any overflow from the image */
+  border-radius: 10% 10% 10% 10%; /* Keep the rounded corners */
+}
+
+.card-item img {
+  width: calc(100% - 8px); /* Subtract the border width to maintain size */
+  height: calc(100% - 8px); /* Subtract the border width to maintain size */
+  object-fit: cover; /* Crop the image to fit the container */
+  object-position: center; /* Center the cropped area */
+  border-radius: 10% 10% 10% 10%; /* Keep the rounded corners */
+  border: 4px solid rgb(41, 80, 56); /* Add the solid border */
+}
+
+
+.card-item:hover {
+  transform: scale(1.05);
+  transition-duration: 0.5s;
+}
+
+.card-item h3 {
+  margin: 0;
+  padding: 0.5em;
+  text-align: center;
+  font-size: 1.5vw;
+  font-family: 'Century Gothic';
+  color: #181818;
+  z-index: 1;
+}
+
+.card-item p {
+  margin: 0;
+  padding: 0.5em;
+  font-family: 'Century Gothic';
+  font-size: 1vw;
+  text-wrap: wrap;
+  color: #1d1d1d;
+  flex-grow: 1;
+  display: flex;
+  justify-content: start;
+  z-index: 1;
+}

@@ -24,7 +24,7 @@ export default defineComponent({
     const gameFinished = ref<boolean>(false);
 
     onMounted(async () => {
-      const response = await fetch('/cards.json'); // Ensure the path is correct
+      const response = await fetch('/assets/PairWiseGame/cards.json'); // Ensure the path is correct
       if (!response.ok) {
         console.error(`Failed to fetch cards: ${response.statusText}`);
         return;

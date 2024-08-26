@@ -1,13 +1,7 @@
-<div
-  class="card-item"
-  :class="{ 'selected': isSelected }"
-  @click="handleClick"
->
+<div class="card-item" :class="{ 'selected': isSelected }" @click="handleClick">
   <div class="image-container">
     <img :src="card.imagePath" :alt="card.title" />
   </div>
   <h3>{{ card.title }}</h3>
   <p>{{ card.description }}</p>
 </div>
-
-

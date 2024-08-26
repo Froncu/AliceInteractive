@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import StatementGame from '@/games/StatementGame/StatementGame.vue';
+import PairWiseGame from '@/games/PairWiseGame/PairWiseGame.vue';
 
 const routes = [
     {
-        path: '/statementgame',
-        name: 'StatementGame',
-        component: StatementGame
+        path: '/PairWiseGame',
+        name: 'PairWiseGame',
+        component: PairWiseGame
     },
     {
         path: '/',
-        redirect: '/statementgame'
+        redirect: '/PairWiseGame'
     }
 ];
 export const router = createRouter({

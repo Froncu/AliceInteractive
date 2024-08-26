@@ -1,7 +1,7 @@
 .card-item {
   width: 20vw;
   height: calc(20vw * (4/3));
-  background-image: url('/public/backimage.png');
+  background-image: url('/public/assets/PairWiseGame/backimage.png');
   background-size: cover;
   border-radius: 10%;
   box-shadow: 6px 6px 7px 7px rgba(0, 0, 0, 0.416); 

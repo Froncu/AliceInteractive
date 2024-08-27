@@ -25,10 +25,9 @@ export default defineComponent({
     const resolveSelection = ref<((id: number) => void) | null>(null);
     const gameFinished = ref<boolean>(false);
     const choiceTimer = ref<InstanceType<typeof ChoiceTimer> | null>();
+    const useTimer = ref(true);
 
     onMounted(async () => {
-      console.log(choiceTimer.value)
-
       if (choiceTimer.value)
         choiceTimer.value.start();
 
@@ -100,6 +99,7 @@ export default defineComponent({
 
     function finishGame() {
       gameFinished.value = true; // Set the game as finished, showing the download button and results
+      useTimer.value = false;
     }
 
     function downloadJSON() {
@@ -121,6 +121,7 @@ export default defineComponent({
       selectedCardId,
       gameFinished,
       choiceTimer,
+      useTimer,
       handleCardSelection,
       downloadJSON, // Expose the download function to the template
       handleTimeUp

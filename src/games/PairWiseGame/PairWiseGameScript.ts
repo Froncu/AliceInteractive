@@ -1,6 +1,7 @@
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import CardItem from '@/components/CardItem/CardItem.vue';
 import BackGround from '@/components/Background/BackGround.vue';
+import ChoiceTimer from '@/components/ChoiceTimer/ChoiceTimer.vue';
 
 interface Card {
   id: number;
@@ -14,6 +15,7 @@ export default defineComponent({
   components: {
     CardItem,
     BackGround,
+    ChoiceTimer
   },
   setup() {
     const cards = ref<Card[]>([]);
@@ -22,8 +24,14 @@ export default defineComponent({
     const selectedCardId = ref<number | null>(null);
     const resolveSelection = ref<((id: number) => void) | null>(null);
     const gameFinished = ref<boolean>(false);
+    const choiceTimer = ref<InstanceType<typeof ChoiceTimer> | null>();
 
     onMounted(async () => {
+      console.log(choiceTimer.value)
+
+      if (choiceTimer.value)
+        choiceTimer.value.start();
+
       const response = await fetch('/assets/PairWiseGame/cards.json'); // Ensure the path is correct
       if (!response.ok) {
         console.error(`Failed to fetch cards: ${response.statusText}`);
@@ -34,6 +42,13 @@ export default defineComponent({
       sortedCards.value = await quickSort(cards.value); // Start the quicksort
       finishGame();
     });
+
+    function handleTimeUp() {
+      if (!choiceTimer.value)
+        return;
+
+      handleCardSelection(currentPair.value[Math.floor(Math.random())].id);
+    }
 
     async function quickSort(array: Card[]): Promise<Card[]> {
       if (array.length <= 1) return array;
@@ -78,6 +93,9 @@ export default defineComponent({
         resolveSelection.value(cardId); // Resolve the promise with the selected card's ID
         resolveSelection.value = null; // Reset the resolve function for the next selection
       }
+
+      if (choiceTimer.value)
+        choiceTimer.value.reset(true);
     }
 
     function finishGame() {
@@ -102,8 +120,10 @@ export default defineComponent({
       currentPair,
       selectedCardId,
       gameFinished,
+      choiceTimer,
       handleCardSelection,
       downloadJSON, // Expose the download function to the template
+      handleTimeUp
     };
   },
 });

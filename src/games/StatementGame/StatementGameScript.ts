@@ -19,7 +19,7 @@ export default defineComponent({
       rightPlaceholderImage: string;
       rightPlaceholderText: string;
     }[] = [];
-
+ 
     const currentIndex = ref<number>(0);
     const imagePath = ref<string | undefined>(undefined);
     const textContent = ref<string>('Loading...');
@@ -36,8 +36,7 @@ export default defineComponent({
       secondsTaken: number;
     }[] = [];
 
-    const choiceTimer = ref<{ resetTimer: () => void } | null>(null);
-    const startTime = ref<number | null>(null);
+    const choiceTimer = ref<InstanceType<typeof ChoiceTimer> | null>();
 
     const fetchData = async () => {
       try {
@@ -51,10 +50,9 @@ export default defineComponent({
       }
     };
 
-    const loadNextCard = () => {
-      if (choiceTimer.value) {
-        choiceTimer.value.resetTimer();
-      }
+    function loadNextCard() {
+      if (choiceTimer.value)
+        choiceTimer.value.reset(true);
 
       if (currentIndex.value < cardData.length) {
         const currentCard = cardData[currentIndex.value];
@@ -64,25 +62,25 @@ export default defineComponent({
         leftPlaceholderText.value = currentCard.leftPlaceholderText;
         rightPlaceholderImage.value = currentCard.rightPlaceholderImage;
         rightPlaceholderText.value = currentCard.rightPlaceholderText;
-        startTime.value = Date.now(); // Track the start time
         currentIndex.value++;
       } else {
         textContent.value = 'No more cards!';
         saveAnswersToFile();
       }
-    };
+    }
 
-    function onChoiceMade(placeholder: { image: string | undefined, text: string }){
-      if (imagePath.value !== undefined && startTime.value !== null) {
-        const secondsTaken = (Date.now() - startTime.value) / 1000; // Calculate time taken in seconds
-        answers.push({
-          givenImageSource: imagePath.value,
-          givenText: textContent.value,
-          chosenImageSource: placeholder.image,
-          chosenText: placeholder.text,
-          secondsTaken
-        });
-      }
+    function onChoiceMade(placeholder: { image: string | undefined, text: string }) {
+      if (imagePath.value === undefined || !choiceTimer.value)
+        return;
+
+      answers.push({
+        givenImageSource: imagePath.value,
+        givenText: textContent.value,
+        chosenImageSource: placeholder.image,
+        chosenText: placeholder.text,
+        secondsTaken: choiceTimer.value.secondsRemaining()
+      });
+
       loadNextCard();
     }
 
@@ -95,7 +93,7 @@ export default defineComponent({
       a.download = 'answers.json';
       a.click();
       URL.revokeObjectURL(url);
-    };  
+    };
 
     const handleTimeUp = () => {
       answers.push(
@@ -134,8 +132,8 @@ export default defineComponent({
       leftPlaceholderText,
       rightPlaceholderImage,
       rightPlaceholderText,
-      onChoiceMade,
       choiceTimer,
+      onChoiceMade,
       handleTimeUp
     };
   }

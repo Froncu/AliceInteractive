@@ -26,5 +26,5 @@
     </template>
   </PlaceHolder>
 
-  <ChoiceTimer ref="choiceTimer" @time-up="handleTimeUp" />
+  <ChoiceTimer ref="choiceTimer" startSeconds="20" @elapsed="handleTimeUp" />
 </div>

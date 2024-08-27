@@ -1,38 +1,54 @@
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, onUnmounted } from 'vue';
 
 export default defineComponent({
   name: 'ChoiceTimer',
-  emits: ['time-up'],
-  setup(_, { emit }) {
-    const timeRemaining = ref(20);
-    let timerInterval: number | null = null;
+  props: {
+    startSeconds: {
+      type: Number,
+      required: true,
+    }
+  },
+  emits: ['elapsed'],
+  setup(props, { emit }) {
+    const timeRemaining = ref(props.startSeconds);
+    let timerInterval = 0;
 
-    const startTimer = () => {
-      timeRemaining.value = 20; // reset timer
-      if (timerInterval) clearInterval(timerInterval);
+    function start() {
+      if (timerInterval)
+        return;
 
       timerInterval = window.setInterval(() => {
         timeRemaining.value -= 1;
         if (timeRemaining.value <= 0) {
-          clearInterval(timerInterval as number);
-          emit('time-up');
+          clearInterval(timerInterval);
+          emit('elapsed');
         }
       }, 1000);
-    };
+    }
 
-    const resetTimer = () => {
-      timeRemaining.value = 20;
-      startTimer(); // Restart the timer
-    };
+    function reset(startAfter: boolean) {
+      timeRemaining.value = props.startSeconds;
+      clearInterval(timerInterval);
+      timerInterval = 0;
 
-    onMounted(() => {
-      startTimer();
-    });
+      if (startAfter)
+        start();
+    }
+
+    function secondsRemaining() {
+      return timeRemaining.value;
+    }
 
     onUnmounted(() => {
-      if (timerInterval) clearInterval(timerInterval);
+      reset(false);
+      console.log("mounted");
     });
 
-    return { timeRemaining, startTimer, resetTimer };
+    return {
+      timeRemaining,
+      start,
+      reset,
+      secondsRemaining
+    };
   }
 });

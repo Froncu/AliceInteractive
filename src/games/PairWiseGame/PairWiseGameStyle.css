@@ -3,6 +3,8 @@
   width: 100%;
   height: 100%;
   display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 0;
 }
 
@@ -29,11 +31,8 @@
 }
 
 .results-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  width: 20%;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -42,33 +41,53 @@
 }
 
 .ranking-list {
-  position: relative;
+  width: 100%;
   list-style-type: none;
-  padding: 1vw;
-  margin: 0;
+  text-align: center;
   font-family: 'Century Gothic';
   font-size: 1.2vw;
   color: #295038;
   text-align: left;
   border: 3px solid #295038;
   border-radius: 5%;
+  padding: 1vw; /* Ensure padding around the text */
+  box-sizing: border-box;
   z-index: 1;
 }
 
 .ranking-list h1 {
-  margin: 0px;
+  text-align: center;
+  margin-top: 1vh;
+}
+
+.ranking-list li {
+  margin-bottom: 1vh;
 }
 
 .download-button {
-  position: relative;
-  background-color: #295038;
-  border-radius: 0.5vw;
+  width: 100%;
+  margin-top: 1%; /* Maintain a consistent distance between ranking and button */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 }
 
 .download-button button {
+  width: 100%;
+  height: auto;
+  padding: 1vw; /* Ensure padding within the button */
+  background-color: #295038;
   font-family: 'Century Gothic';
   font-size: 1.2vw;
+  text-wrap: nowrap;
+  color: white; /* Set text color to white */
   border: none;
+  border-radius: 1vw; /* Match the border-radius of the ranking-list */
   cursor: pointer;
   z-index: 1;
+}
+
+.download-button button:hover {
+  background-color: #1d3926; /* Darker shade on hover */
 }

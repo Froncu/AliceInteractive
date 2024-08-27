@@ -78,7 +78,7 @@ export default defineComponent({
         givenText: textContent.value,
         chosenImageSource: placeholder.image,
         chosenText: placeholder.text,
-        secondsTaken: choiceTimer.value.secondsRemaining()
+        secondsTaken: choiceTimer.value.startSeconds - choiceTimer.value.secondsRemaining()
       });
 
       loadNextCard();

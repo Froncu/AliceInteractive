@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, onMounted} from 'vue';
 import CardItem from '@/components/CardItem/CardItem.vue';
 import BackGround from '@/components/Background/BackGround.vue';
 import ChoiceTimer from '@/components/ChoiceTimer/ChoiceTimer.vue';

@@ -56,6 +56,7 @@
 }
 
 .ranking-list h1 {
+  text-align: center;
   margin-top: 1vh;
 }
 
@@ -74,10 +75,12 @@
 
 .download-button button {
   width: 100%;
+  height: auto;
   padding: 1vw; /* Ensure padding within the button */
   background-color: #295038;
   font-family: 'Century Gothic';
   font-size: 1.2vw;
+  text-wrap: nowrap;
   color: white; /* Set text color to white */
   border: none;
   border-radius: 1vw; /* Match the border-radius of the ranking-list */

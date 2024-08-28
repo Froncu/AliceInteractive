@@ -1,8 +1,22 @@
 .association-game {
     position: absolute;
-    left: 50%;
+    width: 100%;
+    height: 100%;
+}
+
+.white-board-container {
+    position: absolute;
+    left: 55vw;
     top: 50%;
-    width: 75%;
-    height: 75%;
+    width: 80vw;
+    height: 90vh;
     translate: -50% -50%;
+}
+
+.tool-bar-container {
+    position: absolute;
+    left: 5vw;
+    top: 50vh;
+    translate: -50% -50%;
+    display: flex;
 }

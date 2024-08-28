@@ -5,7 +5,7 @@ export default defineComponent({
   
   setup() {
     function activate() {
-      //base activate
+      console.log(1);
     }
 
     function deactivate() {

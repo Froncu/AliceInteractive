@@ -15,11 +15,12 @@ export default defineComponent({
 
     onMounted(() => {
       canvasFabric = new fabric.Canvas(props.name);
+      canvasFabric.selection = false;
       resizeCanvas();
       window.addEventListener("resize", resizeCanvas);
     });
 
-    onUnmounted(()=>{
+    onUnmounted(() => {
       window.removeEventListener("resize", resizeCanvas);
     })
 

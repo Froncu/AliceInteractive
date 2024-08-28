@@ -30,7 +30,6 @@ export default defineComponent({
 
       // TODO: this is ugly and probably not a good idea, it should be handeled differentely
       const parent = canvasHTML.value.parentElement?.parentElement?.parentElement;
-      console.log(parent);
       if (!parent)
         return;
 

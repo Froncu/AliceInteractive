@@ -41,7 +41,6 @@ export default defineComponent({
 
     onUnmounted(() => {
       reset(false);
-      console.log("mounted");
     });
 
     return {

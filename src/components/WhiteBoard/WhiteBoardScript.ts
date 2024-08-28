@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import * as fabric from 'fabric';
 
 export default defineComponent({
@@ -16,8 +16,12 @@ export default defineComponent({
     onMounted(() => {
       canvasFabric = new fabric.Canvas(props.name);
       resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener("resize", resizeCanvas);
     });
+
+    onUnmounted(()=>{
+      window.removeEventListener("resize", resizeCanvas);
+    })
 
     function resizeCanvas() {
       if (!canvasHTML.value)
@@ -25,9 +29,11 @@ export default defineComponent({
 
       // TODO: this is ugly and probably not a good idea, it should be handeled differentely
       const parent = canvasHTML.value.parentElement?.parentElement?.parentElement;
+      console.log(parent);
+      if (!parent)
+        return;
 
-      if (parent)
-        canvasFabric.setDimensions({ width: parent.clientWidth, height: parent.clientHeight });
+      canvasFabric.setDimensions({ width: parent.clientWidth, height: parent.clientHeight });
     }
 
     function canvas() {
@@ -35,6 +41,7 @@ export default defineComponent({
     }
 
     return {
+      canvasHTML,
       canvas
     }
   }

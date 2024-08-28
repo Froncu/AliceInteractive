@@ -1,6 +1,7 @@
 .base-tool {
-    position: relative;
-    width: 32px;
-    height: 32px;
-    border: 2px solid black;
+  /* Default styling for tools */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
 }

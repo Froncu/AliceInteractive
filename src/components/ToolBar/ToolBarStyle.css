@@ -1,6 +1,19 @@
-.tool-bar {
-    position: relative;
-    width: calc(90vh / 9);
-    height: 90vh;
-    border: 2px solid black;
-}
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #000;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  .tool-container {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+  }
+  
+  button {
+    margin-left: 5px;
+    cursor: pointer;
+    padding: 5px 10px;
+  }

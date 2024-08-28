@@ -1,2 +1,7 @@
-<div class="tool-bar">
+<div class="toolbar">
+  <div class="tool-container" v-for="(tool, index) in tools" :key="tool.name">
+    <component :is="tool.component"></component>
+    <button @click="removeTool(index)">Remove</button>
+  </div>
+  <button @click="addTool">Add Tool</button>
 </div>

@@ -1,15 +1,12 @@
 import { defineComponent } from 'vue';
-
-import BaseTool from '../BaseTool/BaseToolScript';
+import BaseTool from "../BaseTool/BaseTool.vue";
 
 export default defineComponent({
-    name: 'ShapeTool',
-    extends: { BaseTool },
-    setup() {
-        function activate() {
-            console.log(2);
-        }
-
-        return { activate };
-    }
-})
+  name: 'SelectTool',
+  extends: BaseTool,
+  setup() {
+    return {
+      // Specific logic for SelectTool
+    };
+  }
+});

@@ -1,7 +1,5 @@
 <div class="toolbar">
-  <div class="tool-container" v-for="(tool, index) in tools" :key="tool.name">
-    <component :is="tool.component"></component>
-    <button @click="removeTool(index)">Remove</button>
-  </div>
-  <button @click="addTool">Add Tool</button>
+  <button v-for="(tool, index) in tools" :key="index" @click="chooseTool(index)">
+    Tool {{ index + 1 }}
+  </button>
 </div>

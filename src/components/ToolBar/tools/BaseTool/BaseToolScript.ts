@@ -1,23 +1,20 @@
-import * as fabric from 'fabric';
+import { defineComponent } from 'vue';
 
-export default abstract class BaseTool {
-  protected canvas: fabric.Canvas;
+export default defineComponent({
+  name: 'BaseTool',
+  
+  setup() {
+    function activate() {
+      //base activate
+    }
 
-  constructor(canvas: fabric.Canvas) {
-    this.canvas = canvas;
+    function deactivate() {
+      //base deactivate
+    }
+
+    return {
+      activate,
+      deactivate
+    }
   }
-
-  // Common method to initialize the tool
-  public abstract initialize(): void;
-
-  // Common method to destroy the tool (remove event listeners, etc.)
-  public abstract destroy(): void;
-/* 
-  public abstract onMouseDown(event: fabric.TEvent): void;
-
-  public abstract onMouseMove(event: fabric.TEvent): void;
-
-  public abstract onMouseUp(event: fabric.TEvent): void; */
-
-  public abstract onClick(event: fabric.TEvent): void;
-}
+});

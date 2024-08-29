@@ -18,11 +18,7 @@ export class BackgroundTool implements BaseTool{
 
     startUse(canvas: fabric.Canvas, position: { x: number; y: number; }): void{
         
-        this.m_rValue = (Math.random() * 255).toString();
-        this.m_bValue = (Math.random() * 255).toString();
-        this.m_gValue = (Math.random() * 255).toString();
-
-        this.m_backgroundColor = "rgb(" + this.m_rValue + ", " + this.m_gValue + ", " + this.m_bValue + ")";
+        this.m_backgroundColor = "rgb(" + (Math.random() * 255).toString() + ", " + (Math.random() * 255).toString() + ", " + (Math.random() * 255).toString() + ")";
 
         canvas.backgroundColor = this.m_backgroundColor;
         canvas.renderAll();

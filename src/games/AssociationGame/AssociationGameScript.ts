@@ -5,6 +5,7 @@ import { BaseTool } from '@/components/ToolBar/tools/BaseTool';
 import { SelectTool } from '@/components/ToolBar/tools/SelectTool';
 import { MoveTool } from '@/components/ToolBar/tools/MoveTool';
 import { ShapeTool } from '@/components/ToolBar/tools/ShapeTool';
+import { BrushTool } from '@/components/ToolBar/tools/BrushTool';
 
 export default defineComponent({
   name: 'AssociationGame',
@@ -19,7 +20,8 @@ export default defineComponent({
     const toolbarTools: BaseTool[] = [
       new SelectTool(),
       new MoveTool(),
-      new ShapeTool()
+      new ShapeTool(),
+      new BrushTool()
     ];
 
     onMounted(() => {

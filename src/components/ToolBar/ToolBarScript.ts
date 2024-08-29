@@ -31,23 +31,54 @@ export default defineComponent({
         props.tools[activeToolIndex].onChosen(whiteBoard.value.canvas());
     }
 
-    function useActiveTool(event: fabric.TPointerEventInfo) {
-      if (whiteBoard.value)
-        props.tools[activeToolIndex].use(
-          whiteBoard.value.canvas(),
-          { x: event.viewportPoint.x, y: event.viewportPoint.y });
+    function startUseActiveTool(event: fabric.TPointerEventInfo) {
+      if (!whiteBoard.value || activeToolIndex == -1)
+        return;
+
+      props.tools[activeToolIndex].startUse(
+        whiteBoard.value.canvas(),
+        { x: event.scenePoint.x, y: event.scenePoint.y });
+
+      whiteBoard.value.canvas().on('mouse:move', useActiveTool);
+      useActiveTool(event);
     }
+
+    function useActiveTool(event: fabric.TPointerEventInfo) {
+      if (!whiteBoard.value || activeToolIndex == -1)
+        return;
+
+      props.tools[activeToolIndex].use(
+        whiteBoard.value.canvas(),
+        { x: event.scenePoint.x, y: event.scenePoint.y });
+    }
+
+    function endUseActiveTool(event: fabric.TPointerEventInfo) {
+      if (!whiteBoard.value || activeToolIndex == -1)
+        return;
+
+      props.tools[activeToolIndex].endUse(
+        whiteBoard.value.canvas(),
+        { x: event.scenePoint.x, y: event.scenePoint.y });
+
+      whiteBoard.value.canvas().off('mouse:move', useActiveTool);
+    }
+
 
     function setTargetWhiteBoard(targetWhiteBoard: InstanceType<typeof WhiteBoard>) {
       whiteBoard.value = targetWhiteBoard;
     }
 
     watch(whiteBoard, (newWhiteBoard, oldWhiteBoard) => {
-      if (oldWhiteBoard)
-        oldWhiteBoard.canvas().off('mouse:down', useActiveTool);
+      if (oldWhiteBoard) {
+        oldWhiteBoard.canvas().off('mouse:down', startUseActiveTool);
+        oldWhiteBoard.canvas().off('mouse:move', useActiveTool);
+        oldWhiteBoard.canvas().off('mouse:up', endUseActiveTool);
+      }
 
-      if (newWhiteBoard)
-        newWhiteBoard.canvas().on('mouse:down', useActiveTool);
+      if (newWhiteBoard) {
+        newWhiteBoard.canvas().on('mouse:down', startUseActiveTool);
+        newWhiteBoard.canvas().on('mouse:up', endUseActiveTool);
+      }
     }, { immediate: true });
 
     return {

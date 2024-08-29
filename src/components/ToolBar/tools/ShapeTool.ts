@@ -1,18 +1,17 @@
 import { BaseTool } from "./BaseTool";
 
-import { Canvas } from "fabric/*";
 import * as fabric from "fabric";
 
 export class ShapeTool implements BaseTool {
-    onChosen(canvas: Canvas): void {
-        console.log('Shape tool chosen');
+    onChosen(): void {
+        return;
     }
-    onUnchosen(canvas: Canvas): void {
-        console.log('Shape tool unchosen');
-    }
-    use(canvas: Canvas, position: { x: number, y: number }): void {
-        console.log('Shape tool use', position);
 
+    onUnchosen(): void {
+        return;
+    }
+
+    startUse(canvas: fabric.Canvas, position: { x: number, y: number }): void {
         const rect = new fabric.Rect({
             left: position.x - 50,
             top: position.y - 50,
@@ -20,8 +19,16 @@ export class ShapeTool implements BaseTool {
             width: 100,
             height: 100,
             selectable: false
-          });
+        });
 
-          canvas.add(rect);
+        canvas.add(rect);
+    }
+
+    use(): void {
+        return
+    }
+
+    endUse(): void {
+        return;
     }
 }

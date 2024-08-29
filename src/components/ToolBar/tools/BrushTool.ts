@@ -8,32 +8,33 @@ export class BrushTool implements BaseTool {
   private m_brushTransparency = 1;
 
   onChosen(canvas: fabric.Canvas): void {
-    console.log('Pen tool chosen');
     canvas.isDrawingMode = true;
 
-    // Set up the brush
     canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
     const brush = canvas.freeDrawingBrush;
 
-    // Store the current brush as the default if not already done
     this.m_defaultBrush = brush;
 
-    // Set brush properties
     brush.color = this.m_brushColor;
     brush.width = this.m_brushSize;
   }
 
   onUnchosen(canvas: fabric.Canvas): void {
-    console.log('Brush tool unchosen');
     canvas.isDrawingMode = false;
   }
 
-  use(canvas: fabric.Canvas, position: { x: number; y: number }): void {
-    console.log('Brush tool use', position);
-    // Drawing happens automatically with the brush, so no need to manually implement use
+  startUse(): void {
+    return;
   }
 
-  // Additional methods to modify brush properties if needed
+  use(): void {
+    return;
+  }
+
+  endUse(): void {
+    return;
+  }
+
   /* setBrushSize(size: number): void {
     this.m_brushSize = size;
     if (this.m_defaultBrush) {

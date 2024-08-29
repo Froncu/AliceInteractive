@@ -3,16 +3,13 @@ import { Canvas } from "fabric/*";
 
 export class SelectTool implements BaseTool {
     onChosen(canvas: Canvas): void {
-        console.log('Select tool chosen');
-
         canvas.selection = true;
         canvas.forEachObject((object) => {
             object.selectable = true;
         })
     }
-    onUnchosen(canvas: Canvas): void {
-        console.log('Select tool unchosen');
 
+    onUnchosen(canvas: Canvas): void {
         canvas.discardActiveObject();
         canvas.renderAll();
         canvas.selection = false;
@@ -20,7 +17,16 @@ export class SelectTool implements BaseTool {
             object.selectable = false;
         })
     }
-    use(canvas: Canvas, position: { x: number, y: number }): void {
-        console.log('Select tool use', position);
+
+    startUse(): void {
+        return;
+    }
+
+    use(): void {
+        return;
+    }
+
+    endUse(): void {
+        return;
     }
 }

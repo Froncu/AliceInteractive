@@ -1,14 +1,30 @@
 import { BaseTool } from "./BaseTool";
-import { Canvas } from "fabric/*";
+
+import * as fabric from "fabric/*";
 
 export class MoveTool implements BaseTool {
-    onChosen(canvas: Canvas): void {
-        console.log('Move tool chosen');
+    onChosen(): void {
+        return;
     }
-    onUnchosen(canvas: Canvas): void {
-        console.log('Move tool unchosen');
+
+    onUnchosen(): void {
+        return;
     }
-    use(canvas: Canvas, position: { x: number, y: number }): void {
-        console.log('Move tool use', position);
+    
+    startUse(canvas: fabric.Canvas, position: { x: number, y: number }): void {
+        this.grabPosition = position;
     }
+    
+    use(canvas: fabric.Canvas, position: { x: number, y: number }): void {
+        canvas.viewportTransform[4] += position.x - this.grabPosition.x;
+        canvas.viewportTransform[5] += position.y - this.grabPosition.y;
+
+        canvas.renderAll();
+    }
+    
+    endUse(): void {
+        return;
+    }
+
+    private grabPosition = {x: 0, y: 0};
 }

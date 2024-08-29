@@ -5,36 +5,40 @@ export class BrushTool implements BaseTool {
   private m_defaultBrush?: fabric.BaseBrush;
   private m_brushSize = 5;
   private m_brushColor = "rgba(0, 0, 0, 1)";
-  private m_brushTransparency = 1;
+  //private m_brushTransparency = 1;
 
   onChosen(canvas: fabric.Canvas): void {
     canvas.isDrawingMode = true;
 
     canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-    const brush = canvas.freeDrawingBrush;
 
-    this.m_defaultBrush = brush;
+    // Store the current brush as the default if not already done
+    this.m_defaultBrush = canvas.freeDrawingBrush;
 
-    brush.color = this.m_brushColor;
-    brush.width = this.m_brushSize;
+    // Set brush properties
+    this.m_defaultBrush.color = this.m_brushColor;
+    this.m_defaultBrush.width = this.m_brushSize;
   }
 
   onUnchosen(canvas: fabric.Canvas): void {
     canvas.isDrawingMode = false;
   }
 
-  startUse(): void {
+  startUse(canvas: fabric.Canvas, position: { x: number; y: number; }): void{
     return;
   }
-
-  use(): void {
+  
+  use(canvas: fabric.Canvas, position: { x: number; y: number }): void {
     return;
+    // Drawing happens automatically with the brush, so no need to manually implement use
   }
 
-  endUse(): void {
-    return;
+  endUse(canvas: fabric.Canvas, position: { x: number; y: number; }): void{
+    canvas.item(0).selectable = false;
+    canvas.renderAll();
   }
 
+  // Additional methods to modify brush properties if needed
   /* setBrushSize(size: number): void {
     this.m_brushSize = size;
     if (this.m_defaultBrush) {

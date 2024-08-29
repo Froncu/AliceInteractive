@@ -6,6 +6,7 @@ import { SelectTool } from '@/components/ToolBar/tools/SelectTool';
 import { MoveTool } from '@/components/ToolBar/tools/MoveTool';
 import { ShapeTool } from '@/components/ToolBar/tools/ShapeTool';
 import { BrushTool } from '@/components/ToolBar/tools/BrushTool';
+import { BackgroundTool } from '@/components/ToolBar/tools/BackgroundTool';
 
 export default defineComponent({
   name: 'AssociationGame',
@@ -21,7 +22,8 @@ export default defineComponent({
       new SelectTool(),
       new MoveTool(),
       new ShapeTool(),
-      new BrushTool()
+      new BrushTool(),
+      new BackgroundTool()
     ];
 
     onMounted(() => {

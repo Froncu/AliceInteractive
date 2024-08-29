@@ -1,4 +1,4 @@
-import { defineComponent, ref, Ref, PropType, watch } from 'vue';
+import { defineComponent, ref, PropType, watch } from 'vue';
 import * as fabric from "fabric";
 import { BaseTool } from './tools/BaseTool';
 import WhiteBoard from '../WhiteBoard/WhiteBoard.vue';
@@ -12,35 +12,42 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const activeToolIndex = ref<number | null>(null);
-    const whiteBoard = ref<InstanceType<typeof WhiteBoard> | null>(null);
+    let activeToolIndex = -1;
+    const whiteBoard = ref<InstanceType<typeof WhiteBoard>>();
 
-    const chooseTool = (index: number) => {
-      if (activeToolIndex.value !== null && activeToolIndex.value != index && whiteBoard.value)
-        props.tools[activeToolIndex.value].onUnchosen(whiteBoard.value.canvas());
+    function chooseTool(index: number) {
+      if (!whiteBoard.value)
+        return;
 
-      activeToolIndex.value = index;
+      if (activeToolIndex == index)
+        return;
 
+      if (activeToolIndex != -1)
+        props.tools[activeToolIndex].onUnchosen(whiteBoard.value.canvas());
+
+      activeToolIndex = index;
+
+      if (activeToolIndex != -1)
+        props.tools[activeToolIndex].onChosen(whiteBoard.value.canvas());
+    }
+
+    function useActiveTool(event: fabric.TPointerEventInfo) {
       if (whiteBoard.value)
-        props.tools[index].onChosen(whiteBoard.value.canvas());
-    };
+        props.tools[activeToolIndex].use(
+          whiteBoard.value.canvas(),
+          { x: event.viewportPoint.x, y: event.viewportPoint.y });
+    }
 
-    const useActiveTool = (event: fabric.TPointerEventInfo) => {
-      if (activeToolIndex.value !== null && whiteBoard.value)
-        props.tools[activeToolIndex.value].use(whiteBoard.value.canvas(), { x: event.viewportPoint.x, y: event.viewportPoint.y });
-    };
-
-    const setTargetWhiteBoard = (targetWhiteBoard: InstanceType<typeof WhiteBoard> | null) => {
+    function setTargetWhiteBoard(targetWhiteBoard: InstanceType<typeof WhiteBoard>) {
       whiteBoard.value = targetWhiteBoard;
-    };
+    }
 
     watch(whiteBoard, (newWhiteBoard, oldWhiteBoard) => {
-      if (oldWhiteBoard) {
+      if (oldWhiteBoard)
         oldWhiteBoard.canvas().off('mouse:down', useActiveTool);
-      }
-      if (newWhiteBoard) {
+
+      if (newWhiteBoard)
         newWhiteBoard.canvas().on('mouse:down', useActiveTool);
-      }
     }, { immediate: true });
 
     return {

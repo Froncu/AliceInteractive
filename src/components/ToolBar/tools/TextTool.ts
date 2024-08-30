@@ -62,7 +62,7 @@ export class TextTool implements BaseTool {
             this.m_textBox.set({
                 width: this.m_boxWidth,
                 height: this.m_boxHeight,
-                selectable: false, // Ensure the textbox remains non-selectable
+                selectable: false // Ensure the textbox remains non-selectable
             });
 
             // Make sure to re-render the canvas with the final size

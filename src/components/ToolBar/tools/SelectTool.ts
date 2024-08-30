@@ -6,6 +6,7 @@ export class SelectTool implements BaseTool {
         canvas.selection = true;
         canvas.forEachObject((object) => {
             object.selectable = true;
+            object.evented = true;
         })
     }
 
@@ -15,6 +16,7 @@ export class SelectTool implements BaseTool {
         canvas.selection = false;
         canvas.forEachObject((object) => {
             object.selectable = false;
+            object.evented = true;
         })
     }
 

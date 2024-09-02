@@ -35,15 +35,19 @@ export default defineComponent({
       if (toolBar.value && whiteBoard.value) {
         toolBar.value.setTargetWhiteBoard(whiteBoard.value);
       }
-
+      
       if (whiteBoard.value){
-        placeInfluenceZone(200, 'Test zone', whiteBoard.value.canvas().getCenterPoint(), '', 'black', 2);
+        placeInfluenceZone(200, 'Test zone 1', {x:whiteBoard.value.canvas().getWidth()/4, y:whiteBoard.value.canvas().getHeight()/3}, '#FFFAA3', 'black', 1);
+
+        placeInfluenceZone(200, 'Test zone 2', {x:whiteBoard.value.canvas().getWidth()/2, y:whiteBoard.value.canvas().getHeight()* 0.66}, '', 'black', 3, 40, 'red');
+
+        placeInfluenceZone(200, 'Test zone 3', {x:whiteBoard.value.canvas().getWidth()* 0.75, y:whiteBoard.value.canvas().getHeight()/3}, '#A7C7E7', 'black', 6, 25, 'blue');
       }
       
 
     });
 
-    const placeInfluenceZone = (zoneSize: number,  zoneName = "", zonePos = {x: 0, y: 0}, zoneColor = 'white', borderColor = zoneColor, borderSize = 1) => {
+    const placeInfluenceZone = (zoneSize: number,  zoneName = "", zonePos = {x: 0, y: 0}, zoneColor = 'white', borderColor = zoneColor, borderSize = 1, fontSize = 16, textColor = 'black') => {
       if (whiteBoard.value) {
         const canvas = whiteBoard.value.canvas(); // Assuming WhiteBoard has a getCanvas method to get the Fabric canvas instance
 
@@ -60,10 +64,11 @@ export default defineComponent({
         });
 
         const text = new fabric.Textbox(zoneName, {
-          fontSize: 16,
-          fill: '#333',
+          fontSize: fontSize,
+          fill: textColor,
           width: 100,
           textAlign: 'center',
+          fontFamily: 'century gothic',
           selectable: false // Make the text non-selectable
         });
 

@@ -54,10 +54,10 @@ export class MoveTool implements BaseTool {
         const delta = evt.deltaY;
 
         // Adjust zoom level based on scroll direction
-        zoomLevel = zoomLevel - delta / 600;
+        zoomLevel = zoomLevel - delta / 800;
         zoomLevel = Math.min(this.maxZoom, Math.max(this.minZoom, zoomLevel));
 
-        const pointer = canvas.getPointer(evt);
+        const pointer = canvas.getViewportPoint(evt);
         const zoomPoint = new fabric.Point(pointer.x, pointer.y);
 
         // Zoom in or out centered on the mouse pointer

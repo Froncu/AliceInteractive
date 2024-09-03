@@ -86,38 +86,7 @@ export default defineComponent({
           lockMovementY: true,
           evented: false,
         });
-
-        // Example Influence Zone: Circle with Image
-        /* fabric.FabricImage.fromURL(zoneImage, image => {
-          image.scaleToWidth(50);
-          image.scaleToHeight(50);
-          image.set({
-            selectable: false
-          });
-
-          canvas.add(image);
-
-          const imageCircle = new fabric.Circle({
-            radius: radius,
-            fill: '#ff6348',
-            left: 200,
-            top: 200,
-            selectable: false // Make the circle non-selectable
-          });
-
-          // Center the image inside the circle
-          image.set({
-            left: imageCircle.left + (imageCircle.width || 0) / 2 - image.width! / 2,
-            top: imageCircle.top + (imageCircle.height || 0) / 2 - image.height! / 2,
-          });
-
-          const circleWithImage = new fabric.Group([imageCircle, image], {
-            selectable: false // Make the group non-selectable
-          });
-
-          // Add the influence zone with image to the canvas
-          canvas.add(circleWithImage);
-        }); */
+        
 
         // Add the influence zone with text to the canvas
         canvas.add(circleWithText);

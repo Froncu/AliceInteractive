@@ -1,0 +1,6 @@
+<div class="tool-bar">
+  <button v-for="tool in tools" :key="tool.constructor.name" @click="onClick(tool.constructor.name)">
+    {{ tool.constructor.name }}
+  </button>
+  <component :is="activeToolMenu" :settings="activeToolSettings" @settingsChanged="onSettingsChange" />
+</div>

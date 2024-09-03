@@ -8,13 +8,12 @@ export class SelectTool implements BaseTool {
         canvas.forEachObject((object) => {
             object.selectable = true;
             object.evented = true;
-            
-            const unselectable = canvas.getObjects().filter(obj => obj.hasControls === false);
-            unselectable.forEach(obj => {
-                obj.selectable = false;
-            });
-        })
-    }
+            if(!object.hasControls){
+                object.selectable = false;
+                object.evented = false;
+            }
+        }
+    )}
 
     onUnchosen(canvas: Canvas): void {
         canvas.discardActiveObject();
@@ -22,7 +21,7 @@ export class SelectTool implements BaseTool {
         canvas.selection = false;
         canvas.forEachObject((object) => {
             object.selectable = false;
-            object.evented = true;
+            object.evented = false;
         })
     }
 

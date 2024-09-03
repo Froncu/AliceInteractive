@@ -58,20 +58,22 @@ export class ShapeTool implements BaseTool {
 
     endUse(canvas: fabric.Canvas, position: { x: number, y: number }): void {
         if (this.m_rect) {
-            // Ensure minimum size of 20x20 for the rectangle
+            // Ensure minimum size of 15x15 for the rectangle
             if (this.m_shapeWidth < 15 && this.m_shapeHeight < 15 ) {
                 this.m_shapeWidth = 15;
                 this.m_shapeHeight = 15;
-                this.m_rect.left -= this.m_shapeWidth / 2;
-                this.m_rect.top -= this.m_shapeHeight / 2;
+                this.m_rect.set({
+                    left: this.m_startPos!.x - this.m_shapeWidth / 2,
+                    top: this.m_startPos!.y - this.m_shapeHeight / 2
+                });
             }
-
-            // Apply the final size to the rectangle
+            
             this.m_rect.set({
                 width: this.m_shapeWidth,
-                height: this.m_shapeHeight,
-                selectable: false,
+                height: this.m_shapeHeight
             });
+
+            this.m_rect.setCoords();
 
             // Make sure to re-render the canvas with the final size
             canvas.renderAll();

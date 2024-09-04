@@ -6,12 +6,8 @@ export class SelectTool implements BaseTool {
         canvas.selection = true;
         canvas.selectionKey = "ctrlKey";
         canvas.forEachObject((object) => {
-            object.selectable = true;
-            object.evented = true;
-            if(!object.hasControls){
-                object.selectable = false;
-                object.evented = false;
-            }
+            object.selectable = object.hasControls;
+            object.evented = object.hasControls;
         }
     )}
 

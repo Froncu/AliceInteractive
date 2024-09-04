@@ -4,9 +4,15 @@
     <option value="circle">Circle</option>
     <option value="triangle">Triangle</option>
   </select>
+  <div></div>
   <input type="color" id="fillColor" v-model="localSettings.fillColor">Fill Color</input>
+  <div></div>
   <input type="range" min="0" max="16" id="strokeWidth" v-model="localSettings.strokeWidth">Stroke Width</input>
+  <div></div>
   <input type="color" id="strokeColor" v-model="localSettings.strokeColor">Stroke Color</input>
+  <div></div>
   <input type="checkbox" id="centered" v-model="localSettings.centered">Centered</input>
+  <div></div>
   <canvas id="shapePreview" width="64" height="64" />
+  <div></div>
 </div>

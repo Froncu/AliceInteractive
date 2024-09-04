@@ -1,5 +1,5 @@
 import { defineComponent, Component, PropType, shallowRef } from 'vue';
-import { BaseTool, BaseToolSettings } from './tools/BaseTool';
+import { BaseTool, BaseToolSettings } from '../tools/BaseTool';
 import WhiteBoard from '../WhiteBoard/WhiteBoard.vue';
 
 export default defineComponent({

@@ -1,6 +1,6 @@
 import * as fabric from "fabric";
-import { BaseTool, BaseToolSettings } from "./BaseTool";
 import { defineAsyncComponent, Component } from "vue";
+import { BaseTool, BaseToolSettings } from "./BaseTool";
 
 export class BrushToolSettings implements BaseToolSettings {
   type: 'pencil' | 'spray' | 'circle' = 'pencil'
@@ -13,12 +13,13 @@ export class BrushTool implements BaseTool {
   private m_canvas?: fabric.Canvas;
 
   onChosen(canvas: fabric.Canvas): void {
-    this.m_canvas = canvas;
+    this.makeDrawingUnselectable = this.makeDrawingUnselectable.bind(this)
 
+    this.m_canvas = canvas;
     this.m_canvas.isDrawingMode = true;
     this.onUpdateSettings();
 
-    this.m_canvas.on('object:added', this.makeDrawingUnselectable.bind(this))
+    this.m_canvas.on('object:added', this.makeDrawingUnselectable)
   }
 
   onUnchosen(): void {
@@ -26,11 +27,11 @@ export class BrushTool implements BaseTool {
       return;
 
     this.m_canvas.isDrawingMode = false;
-    this.m_canvas.off('object:added', this.makeDrawingUnselectable.bind(this))
+    this.m_canvas.off('object:added', this.makeDrawingUnselectable)
   }
 
   menu(): Component {
-    return defineAsyncComponent(() => import('@/components/ToolBar/tools/BrushToolMenu/BrushToolMenu.vue'));
+    return defineAsyncComponent(() => import('@/components/toolMenus/BrushToolMenu/BrushToolMenu.vue'));
   }
 
   settings(): BrushToolSettings {

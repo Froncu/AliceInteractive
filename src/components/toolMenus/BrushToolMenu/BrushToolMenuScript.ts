@@ -1,5 +1,5 @@
 import { defineComponent, ref, watch } from 'vue';
-import { BrushToolSettings } from '../BrushTool';
+import { BrushToolSettings } from '../../tools/BrushTool';
 
 export default defineComponent({
   name: 'BrushToolMenu',

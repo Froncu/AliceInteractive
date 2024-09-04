@@ -1,6 +1,6 @@
 import * as fabric from "fabric";
-import { BaseTool, BaseToolSettings } from "./BaseTool";
 import { defineAsyncComponent, Component } from "vue";
+import { BaseTool, BaseToolSettings } from "./BaseTool";
 
 export class ShapeToolSettings implements BaseToolSettings {
   shape: 'rectangle' | 'circle' | 'triangle' = 'rectangle';
@@ -19,14 +19,13 @@ export class ShapeTool implements BaseTool {
   private m_ratio = 0;
 
   onChosen(canvas: fabric.Canvas): void {
-    this.m_canvas = canvas;
-
     this.start = this.start.bind(this);
     this.drag = this.drag.bind(this);
     this.end = this.end.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
 
+    this.m_canvas = canvas;
     this.m_canvas.on('mouse:down', this.start)
     this.m_canvas.on('mouse:up', this.end);
 
@@ -47,7 +46,7 @@ export class ShapeTool implements BaseTool {
   }
 
   menu(): Component {
-    return defineAsyncComponent(() => import('@/components/ToolBar/tools/ShapeToolMenu/ShapeToolMenu.vue'));
+    return defineAsyncComponent(() => import('@/components/toolMenus/ShapeToolMenu/ShapeToolMenu.vue'));
   }
 
   settings(): ShapeToolSettings {
@@ -88,6 +87,7 @@ export class ShapeTool implements BaseTool {
       originX: this.m_settings.centered ? 'center' : 'left',
       originY: this.m_settings.centered ? 'center' : 'top',
       scaleY: -1,
+      strokeUniform: true,
 
       fill: this.m_settings.fillColor,
       stroke: this.m_settings.strokeColor,
@@ -135,17 +135,24 @@ export class ShapeTool implements BaseTool {
       (this.m_object as fabric.Ellipse).ry = height / 2;
     }
 
-    this.m_object.scaleX = event.scenePoint.x < this.m_object.left ? -1 : 1;
-    this.m_object.scaleY = event.scenePoint.y < this.m_object.top ? -1 : 1;
+    if (!this.m_settings.centered) {
+      this.m_object.left =
+        event.scenePoint.x < this.m_startPosition.x ?
+          this.m_startPosition.x - width - this.m_settings.strokeWidth :
+          this.m_startPosition.x;
+
+      this.m_object.top =
+        event.scenePoint.y < this.m_startPosition.y ?
+          this.m_startPosition.y - height - this.m_settings.strokeWidth :
+          this.m_startPosition.y;
+    }
 
     this.m_canvas.renderAll();
   }
 
   end(): void {
-    if (!this.m_canvas)
-      return;
-
-    this.m_canvas.off('mouse:move', this.drag);
+    this.m_canvas?.off('mouse:move', this.drag);
+    this.m_object?.setCoords();
   }
 
   onKeyDown(event: KeyboardEvent): void {

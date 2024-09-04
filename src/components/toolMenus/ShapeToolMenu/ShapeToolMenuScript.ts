@@ -1,5 +1,5 @@
 import { defineComponent, nextTick, onMounted, ref, watch } from 'vue';
-import { ShapeToolSettings } from '../ShapeTool';
+import { ShapeToolSettings } from '../../tools/ShapeTool';
 
 export default defineComponent({
   name: 'ShapeToolMenu',

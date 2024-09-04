@@ -11,6 +11,12 @@
 
 .white-board-container {
     position: relative;
-    width: 80%;
+    width: 70%;
     height: 90%;
+}
+
+.tool-bar-container {
+    position: relative;
+    width: 20%;
+    max-height: 90%;
 }

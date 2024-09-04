@@ -32,13 +32,13 @@ export default defineComponent({
     onMounted(() => {
       const zone = new InfluenceZone(
         200, // zoneSize
-        'Test zone 1', // zoneName
+        'Wist je dat ganzen heel graag bananen eten?', // zoneName
         '#FFFAA3', // zoneColor
         'black', // borderColor
         1, // borderSize
-        16, // fontSize
+        20, // fontSize
         'black', // textColor
-        'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/...' // zoneImage
+        'https://kaifolog.ru/uploads/posts/2016-04/1460115572_069.jpg' // zoneImage
       );
 
       if (whiteBoard.value) {

@@ -6,7 +6,7 @@ export abstract class BaseToolSettings {}
 export interface BaseTool {
   onChosen(canvas: Canvas): void;
   onUnchosen(): void;
-  menu(): Component;
+  menu(): Component | null;
   settings(): BaseToolSettings | null;
   changeSettings(newSettings: BaseToolSettings): void;
 }

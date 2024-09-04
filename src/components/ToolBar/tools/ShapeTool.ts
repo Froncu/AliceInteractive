@@ -4,9 +4,10 @@ import { defineAsyncComponent, Component } from "vue";
 
 export class ShapeToolSettings implements BaseToolSettings {
   shape: 'rectangle' | 'circle' | 'triangle' = 'rectangle';
-  fillColor = '#000000';
-  strokeColor = '#ffffff';
-  strokeWidth = 1;
+  fillColor = '#ff0000';
+  strokeColor = '#000000';
+  strokeWidth = 4;
+  centered = false;
 }
 
 export class ShapeTool implements BaseTool {
@@ -14,6 +15,8 @@ export class ShapeTool implements BaseTool {
   private m_canvas?: fabric.Canvas;
   private m_object?: fabric.FabricObject;
   private m_startPosition = { x: 0, y: 0 };
+  private m_minimalSize = { width: 64, height: 64 };
+  private m_ratio = 0;
 
   onChosen(canvas: fabric.Canvas): void {
     this.m_canvas = canvas;
@@ -21,11 +24,14 @@ export class ShapeTool implements BaseTool {
     this.start = this.start.bind(this);
     this.drag = this.drag.bind(this);
     this.end = this.end.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
 
     this.m_canvas.on('mouse:down', this.start)
     this.m_canvas.on('mouse:up', this.end);
 
-    console.log('ShapeTool onChosen');
+    window.addEventListener('keydown', this.onKeyDown)
+    window.addEventListener('keyup', this.onKeyUp)
   }
 
   onUnchosen(): void {
@@ -35,20 +41,21 @@ export class ShapeTool implements BaseTool {
     this.m_canvas.off('mouse:down', this.start)
     this.m_canvas.off('mouse:up', this.end);
 
-    console.log('ShapeTool onUnchosen');
+    window.removeEventListener('keydown', this.onKeyDown)
+    window.removeEventListener('keyup', this.onKeyUp)
+    this.m_ratio = 0;
   }
 
   menu(): Component {
     return defineAsyncComponent(() => import('@/components/ToolBar/tools/ShapeToolMenu/ShapeToolMenu.vue'));
   }
 
-  settings(): BaseToolSettings | null {
+  settings(): ShapeToolSettings {
     return this.m_settings;
   }
 
   changeSettings(settings: ShapeToolSettings): void {
     this.m_settings = settings;
-    console.log(this.m_settings);
   }
 
   start(event: fabric.TPointerEventInfo): void {
@@ -64,7 +71,7 @@ export class ShapeTool implements BaseTool {
         break;
 
       case 'circle':
-        shapeType = fabric.Circle;
+        shapeType = fabric.Ellipse;
         break;
 
       case 'triangle':
@@ -74,17 +81,27 @@ export class ShapeTool implements BaseTool {
 
     this.m_object = new shapeType({
       selectable: false,
-      left: this.m_startPosition.x,
-      top: this.m_startPosition.y,
-      width: 0,
-      height: 0,
+      left: event.scenePoint.x,
+      top: event.scenePoint.y,
+      width: this.m_minimalSize.width - this.m_settings.strokeWidth,
+      height: this.m_minimalSize.height - this.m_settings.strokeWidth,
+      originX: this.m_settings.centered ? 'center' : 'left',
+      originY: this.m_settings.centered ? 'center' : 'top',
+      scaleY: -1,
 
       fill: this.m_settings.fillColor,
       stroke: this.m_settings.strokeColor,
       strokeWidth: this.m_settings.strokeWidth
     });
 
+    if (this.m_object.isType('Ellipse')) {
+      (this.m_object as fabric.Ellipse).rx = (this.m_minimalSize.width - this.m_settings.strokeWidth) / 2;
+      (this.m_object as fabric.Ellipse).ry = (this.m_minimalSize.height - this.m_settings.strokeWidth) / 2;
+    }
+
     this.m_canvas.add(this.m_object);
+    this.m_canvas.renderAll();
+
     this.m_canvas.on('mouse:move', this.drag);
   }
 
@@ -92,40 +109,56 @@ export class ShapeTool implements BaseTool {
     if (!this.m_canvas || !this.m_object)
       return;
 
-    const deltaX = event.scenePoint.x - this.m_startPosition.x;
-    const deltaY = event.scenePoint.y - this.m_startPosition.y;
+    let deltaX = Math.abs(event.scenePoint.x - this.m_startPosition.x);
+    let deltaY = Math.abs(event.scenePoint.y - this.m_startPosition.y);
 
-    if (this.m_object.isType('circle'))
-      (this.m_object as fabric.Circle).radius = Math.min(deltaX, deltaY);
+    if (this.m_settings.centered) {
+      deltaX *= 2;
+      deltaY *= 2;
+    }
+
+    let width = (deltaX < this.m_minimalSize.width ? this.m_minimalSize.width : deltaX) - this.m_settings.strokeWidth;
+    let height = (deltaY < this.m_minimalSize.height ? this.m_minimalSize.height : deltaY) - this.m_settings.strokeWidth;
+
+    if (this.m_ratio) {
+      width = Math.max(width, height * this.m_ratio);
+      height = width / this.m_ratio;
+    }
 
     this.m_object.set({
-      width: deltaX,
-      height: deltaY,
+      width: width,
+      height: height,
     });
+
+    if (this.m_object.isType('Ellipse')) {
+      (this.m_object as fabric.Ellipse).rx = width / 2;
+      (this.m_object as fabric.Ellipse).ry = height / 2;
+    }
+
+    this.m_object.scaleX = event.scenePoint.x < this.m_object.left ? -1 : 1;
+    this.m_object.scaleY = event.scenePoint.y < this.m_object.top ? -1 : 1;
 
     this.m_canvas.renderAll();
   }
 
   end(): void {
-    if (!this.m_canvas || !this.m_object)
+    if (!this.m_canvas)
       return;
 
-    const minimalSize = { width: 15, height: 15 };
-
-    if (Math.abs(this.m_object.width) < minimalSize.width && Math.abs(this.m_object.height) < minimalSize.height) {
-      this.m_object.left -= this.m_object.width / 2;
-      this.m_object.top -= this.m_object.height / 2;
-
-      this.m_object.set({
-        left: this.m_object.left - minimalSize.width / 2,
-        top: this.m_object.top - minimalSize.height / 2,
-        width: minimalSize.width,
-        height: minimalSize.height,
-        selectable: false
-      });
-    }
-
-    this.m_canvas.renderAll();
     this.m_canvas.off('mouse:move', this.drag);
+  }
+
+  onKeyDown(event: KeyboardEvent): void {
+    if (!this.m_object || !event.shiftKey)
+      return;
+
+    this.m_ratio = this.m_object.width / this.m_object.height;
+  }
+
+  onKeyUp(event: KeyboardEvent): void {
+    if (!this.m_object || event.shiftKey)
+      return;
+
+    this.m_ratio = 0;
   }
 }

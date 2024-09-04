@@ -1,4 +1,4 @@
-import { defineComponent, Component, PropType, ref } from 'vue';
+import { defineComponent, Component, PropType, shallowRef } from 'vue';
 import { BaseTool, BaseToolSettings } from './tools/BaseTool';
 import WhiteBoard from '../WhiteBoard/WhiteBoard.vue';
 
@@ -16,8 +16,8 @@ export default defineComponent({
   },
   setup(props) {
     let activeTool: BaseTool | undefined;
-    const activeToolMenu = ref<Component | null>();
-    const activeToolSettings = ref<BaseToolSettings | null>();
+    const activeToolMenu = shallowRef<Component | null>();
+    const activeToolSettings = shallowRef<BaseToolSettings | null>();
 
     function onClick(toolConstructorName: string) {
       const foundTool = props.tools.find((tool) => { return tool.constructor.name === toolConstructorName; });

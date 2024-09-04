@@ -12,10 +12,6 @@ export default defineComponent({
   setup(props, { emit }) {
     const localSettings = ref({ ...props.settings })
 
-    onMounted(() => {
-      nextTick(updatePreview);
-    });
-
     watch(() => localSettings, () => {
       const input = (document.getElementById("strokeWidth") as HTMLInputElement).value;
       localSettings.value.strokeWidth = parseInt(input, 0);
@@ -23,6 +19,10 @@ export default defineComponent({
       updatePreview();
       emit('settingsChanged', localSettings.value);
     }, { deep: true })
+
+    onMounted(() => {
+      nextTick(updatePreview);
+    });
 
     function updatePreview() {
       const canvas = document.getElementById('shapePreview') as HTMLCanvasElement;
@@ -64,9 +64,9 @@ export default defineComponent({
 
         case 'triangle':
           ctx.beginPath();
-          ctx.moveTo(localSettings.value.strokeWidth * 0.75, canvas.height - localSettings.value.strokeWidth / 2);
-          ctx.lineTo(canvas.width - localSettings.value.strokeWidth * 0.75, canvas.height - localSettings.value.strokeWidth / 2);
-          ctx.lineTo(canvas.width / 2, localSettings.value.strokeWidth);
+          ctx.moveTo(localSettings.value.strokeWidth * 0.75, localSettings.value.strokeWidth / 2);
+          ctx.lineTo(canvas.width - localSettings.value.strokeWidth * 0.75, localSettings.value.strokeWidth / 2);
+          ctx.lineTo(canvas.width / 2, canvas.height - localSettings.value.strokeWidth);
           ctx.closePath();
           ctx.fill();
           ctx.stroke();

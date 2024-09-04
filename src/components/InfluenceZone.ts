@@ -66,12 +66,13 @@ export class InfluenceZone {
     });
 
     // Check if zoneImage is provided
+
     if (this.zoneImage) {
       const imgElement = new Image();
       imgElement.src = this.zoneImage;
 
       imgElement.onload = () => {
-        const customImage = new fabric.Image(imgElement, {
+        const customImage = new fabric.FabricImage(imgElement, {
           selectable: false,
           evented: false,
           hasControls: false,
@@ -81,12 +82,13 @@ export class InfluenceZone {
         customImage.scaleToWidth(this.zoneSize);
 
         customImage.set({
-          top: zonePos.y - customImage.getScaledHeight(),
-          left: zonePos.x - customImage.getScaledWidth() / 2,
+          top: zonePos.y - customImage.getScaledHeight()/2,
+          left: zonePos.x - customImage.getScaledWidth()/2,
         });
 
         text.set({
-          top: circle.top + circle.height / 2,
+          left: circle.left + circle.width / 2 - text.width / 2,
+          top: circle.top + circle.height / 2 + customImage.getScaledHeight()/2,
         });
 
         // Add the image to the canvas

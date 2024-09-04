@@ -86,15 +86,15 @@ export class MoveTool implements BaseTool {
         const canvasWidth = this.m_canvas.getWidth();
         const canvasHeight = this.m_canvas.getHeight();
 
-        const maxPanX = (canvasWidth * this.m_canvas.getZoom() - canvasWidth);
-        const maxPanY = (canvasHeight * this.m_canvas.getZoom() - canvasHeight);
         const transform = this.m_canvas.viewportTransform;
 
+        const maxPanX = (canvasWidth * this.m_canvas.getZoom() - canvasWidth);
         if (transform[4] > 0)
             transform[4] = 0;
         else if (transform[4] < -maxPanX)
             transform[4] = -maxPanX;
 
+        const maxPanY = (canvasHeight * this.m_canvas.getZoom() - canvasHeight);
         if (transform[5] > 0)
             transform[5] = 0;
         else if (transform[5] < -maxPanY)

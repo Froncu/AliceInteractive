@@ -1,9 +1,12 @@
+import { Component } from "vue";
 import { Canvas } from "fabric/*";
 
+export abstract class BaseToolSettings {}
+
 export interface BaseTool {
-  onChosen: (canvas: Canvas) => void;
-  onUnchosen: (canvas: Canvas) => void;
-  startUse: (canvas: Canvas, position: { x: number, y: number }) => void;
-  use: (canvas: Canvas, position: { x: number, y: number }) => void;
-  endUse: (canvas: Canvas, position: { x: number, y: number }) => void;
+  onChosen(canvas: Canvas): void;
+  onUnchosen(): void;
+  menu(): Component | null;
+  settings(): BaseToolSettings | null;
+  changeSettings(newSettings: BaseToolSettings): void;
 }

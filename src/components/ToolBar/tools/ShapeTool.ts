@@ -1,82 +1,164 @@
-import { BaseTool } from "./BaseTool";
 import * as fabric from "fabric";
+import { BaseTool, BaseToolSettings } from "./BaseTool";
+import { defineAsyncComponent, Component } from "vue";
+
+export class ShapeToolSettings implements BaseToolSettings {
+  shape: 'rectangle' | 'circle' | 'triangle' = 'rectangle';
+  fillColor = '#ff0000';
+  strokeColor = '#000000';
+  strokeWidth = 4;
+  centered = false;
+}
 
 export class ShapeTool implements BaseTool {
+  private m_settings = new ShapeToolSettings();
+  private m_canvas?: fabric.Canvas;
+  private m_object?: fabric.FabricObject;
+  private m_startPosition = { x: 0, y: 0 };
+  private m_minimalSize = { width: 64, height: 64 };
+  private m_ratio = 0;
 
-    private m_startPos?: { x: number, y: number };
-    private m_shapeWidth = 0;
-    private m_shapeHeight = 0;
-    private m_rect?: fabric.Rect; // Store the rectangle object
+  onChosen(canvas: fabric.Canvas): void {
+    this.m_canvas = canvas;
 
-    onChosen(): void {
-        return;
+    this.start = this.start.bind(this);
+    this.drag = this.drag.bind(this);
+    this.end = this.end.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
+
+    this.m_canvas.on('mouse:down', this.start)
+    this.m_canvas.on('mouse:up', this.end);
+
+    window.addEventListener('keydown', this.onKeyDown)
+    window.addEventListener('keyup', this.onKeyUp)
+  }
+
+  onUnchosen(): void {
+    if (!this.m_canvas)
+      return;
+
+    this.m_canvas.off('mouse:down', this.start)
+    this.m_canvas.off('mouse:up', this.end);
+
+    window.removeEventListener('keydown', this.onKeyDown)
+    window.removeEventListener('keyup', this.onKeyUp)
+    this.m_ratio = 0;
+  }
+
+  menu(): Component {
+    return defineAsyncComponent(() => import('@/components/ToolBar/tools/ShapeToolMenu/ShapeToolMenu.vue'));
+  }
+
+  settings(): ShapeToolSettings {
+    return this.m_settings;
+  }
+
+  changeSettings(settings: ShapeToolSettings): void {
+    this.m_settings = settings;
+  }
+
+  start(event: fabric.TPointerEventInfo): void {
+    if (!this.m_canvas)
+      return;
+
+    this.m_startPosition = event.scenePoint;
+
+    let shapeType: typeof fabric.FabricObject;
+    switch (this.m_settings.shape) {
+      case 'rectangle':
+        shapeType = fabric.Rect;
+        break;
+
+      case 'circle':
+        shapeType = fabric.Ellipse;
+        break;
+
+      case 'triangle':
+        shapeType = fabric.Triangle;
+        break;
     }
 
-    onUnchosen(): void {
-        return;
+    this.m_object = new shapeType({
+      selectable: false,
+      left: event.scenePoint.x,
+      top: event.scenePoint.y,
+      width: this.m_minimalSize.width - this.m_settings.strokeWidth,
+      height: this.m_minimalSize.height - this.m_settings.strokeWidth,
+      originX: this.m_settings.centered ? 'center' : 'left',
+      originY: this.m_settings.centered ? 'center' : 'top',
+      scaleY: -1,
+
+      fill: this.m_settings.fillColor,
+      stroke: this.m_settings.strokeColor,
+      strokeWidth: this.m_settings.strokeWidth
+    });
+
+    if (this.m_object.isType('Ellipse')) {
+      (this.m_object as fabric.Ellipse).rx = (this.m_minimalSize.width - this.m_settings.strokeWidth) / 2;
+      (this.m_object as fabric.Ellipse).ry = (this.m_minimalSize.height - this.m_settings.strokeWidth) / 2;
     }
 
-    startUse(canvas: fabric.Canvas, position: { x: number, y: number }): void {
-        this.m_startPos = position;
+    this.m_canvas.add(this.m_object);
+    this.m_canvas.renderAll();
 
-        // Create the rectangle at the starting position
-        this.m_rect = new fabric.Rect({
-            left: position.x,
-            top: position.y,
-            fill: 'red',
-            width: 0, // Initially set to 0, as it will be resized
-            height: 0, // Initially set to 0, as it will be resized
-            selectable: false
-        });
+    this.m_canvas.on('mouse:move', this.drag);
+  }
 
-        canvas.add(this.m_rect);
+  drag(event: fabric.TPointerEventInfo): void {
+    if (!this.m_canvas || !this.m_object)
+      return;
+
+    let deltaX = Math.abs(event.scenePoint.x - this.m_startPosition.x);
+    let deltaY = Math.abs(event.scenePoint.y - this.m_startPosition.y);
+
+    if (this.m_settings.centered) {
+      deltaX *= 2;
+      deltaY *= 2;
     }
 
-    use(canvas: fabric.Canvas, position: { x: number, y: number }): void {
-        if (this.m_startPos && this.m_rect) {
-            // Calculate the new width and height based on the current mouse position
-            this.m_shapeWidth = Math.abs(position.x - this.m_startPos.x);
-            this.m_shapeHeight = Math.abs(position.y - this.m_startPos.y);
+    let width = (deltaX < this.m_minimalSize.width ? this.m_minimalSize.width : deltaX) - this.m_settings.strokeWidth;
+    let height = (deltaY < this.m_minimalSize.height ? this.m_minimalSize.height : deltaY) - this.m_settings.strokeWidth;
 
-            // Adjust the rectangle's position and size
-            this.m_rect.set({
-                width: this.m_shapeWidth,
-                height: this.m_shapeHeight
-            });
-
-            if (position.x < this.m_startPos.x) {
-                this.m_rect.set({ left: position.x });
-            }
-            if (position.y < this.m_startPos.y) {
-                this.m_rect.set({ top: position.y });
-            }
-
-            // Render the canvas to apply changes
-            canvas.renderAll();
-        }
+    if (this.m_ratio) {
+      width = Math.max(width, height * this.m_ratio);
+      height = width / this.m_ratio;
     }
 
-    endUse(canvas: fabric.Canvas, position: { x: number, y: number }): void {
-        if (this.m_rect) {
-            // Ensure minimum size of 15x15 for the rectangle
-            if (this.m_shapeWidth < 15 && this.m_shapeHeight < 15 ) {
-                this.m_shapeWidth = 15;
-                this.m_shapeHeight = 15;
-                this.m_rect.set({
-                    left: this.m_startPos!.x - this.m_shapeWidth / 2,
-                    top: this.m_startPos!.y - this.m_shapeHeight / 2
-                });
-            }
-            
-            this.m_rect.set({
-                width: this.m_shapeWidth,
-                height: this.m_shapeHeight
-            });
+    this.m_object.set({
+      width: width,
+      height: height,
+    });
 
-            this.m_rect.setCoords();
-
-            // Make sure to re-render the canvas with the final size
-            canvas.renderAll();
-        }
+    if (this.m_object.isType('Ellipse')) {
+      (this.m_object as fabric.Ellipse).rx = width / 2;
+      (this.m_object as fabric.Ellipse).ry = height / 2;
     }
+
+    this.m_object.scaleX = event.scenePoint.x < this.m_object.left ? -1 : 1;
+    this.m_object.scaleY = event.scenePoint.y < this.m_object.top ? -1 : 1;
+
+    this.m_canvas.renderAll();
+  }
+
+  end(): void {
+    if (!this.m_canvas)
+      return;
+
+    this.m_canvas.off('mouse:move', this.drag);
+  }
+
+  onKeyDown(event: KeyboardEvent): void {
+    if (!this.m_object || !event.shiftKey)
+      return;
+
+    this.m_ratio = this.m_object.width / this.m_object.height;
+  }
+
+  onKeyUp(event: KeyboardEvent): void {
+    if (!this.m_object || event.shiftKey)
+      return;
+
+    this.m_ratio = 0;
+  }
 }

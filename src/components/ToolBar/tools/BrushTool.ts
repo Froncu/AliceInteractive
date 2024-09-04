@@ -1,42 +1,70 @@
-import { BaseTool } from "./BaseTool";
 import * as fabric from "fabric";
+import { BaseTool, BaseToolSettings } from "./BaseTool";
+import { defineAsyncComponent, Component } from "vue";
+
+export class BrushToolSettings implements BaseToolSettings {
+  type: 'pencil' | 'spray' | 'circle' = 'pencil'
+  size = 8;
+  color = '#ff0000';
+}
 
 export class BrushTool implements BaseTool {
-  private m_defaultBrush?: fabric.BaseBrush;
-  private m_brushSize = 5;
-  private m_brushColor = "rgba(0, 0, 0, 1)";
-  //private m_brushTransparency = 1;
+  private m_settings = new BrushToolSettings;
+  private m_canvas?: fabric.Canvas;
 
   onChosen(canvas: fabric.Canvas): void {
-    canvas.isDrawingMode = true;
+    this.m_canvas = canvas;
 
-    canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+    this.m_canvas.isDrawingMode = true;
+    this.onUpdateSettings();
 
-    // Store the current brush as the default if not already done
-    this.m_defaultBrush = canvas.freeDrawingBrush;
-
-    // Set brush properties
-    this.m_defaultBrush.color = this.m_brushColor;
-    this.m_defaultBrush.width = this.m_brushSize;
+    this.m_canvas.on('object:added', this.makeDrawingUnselectable.bind(this))
   }
 
-  onUnchosen(canvas: fabric.Canvas): void {
-    canvas.isDrawingMode = false;
+  onUnchosen(): void {
+    if (!this.m_canvas)
+      return;
+
+    this.m_canvas.isDrawingMode = false;
+    this.m_canvas.off('object:added', this.makeDrawingUnselectable.bind(this))
   }
 
-  startUse(canvas: fabric.Canvas, position: { x: number; y: number; }): void{
-    return;
-  }
-  
-  use(canvas: fabric.Canvas, position: { x: number; y: number }): void {
-    return;
-    // Drawing happens automatically with the brush, so no need to manually implement use
+  menu(): Component {
+    return defineAsyncComponent(() => import('@/components/ToolBar/tools/BrushToolMenu/BrushToolMenu.vue'));
   }
 
-  endUse(canvas: fabric.Canvas, position: { x: number; y: number; }): void{
-    canvas.getObjects().forEach((obj) => {
-      obj.selectable = false;
-    });
-    canvas.renderAll();
+  settings(): BrushToolSettings {
+    return this.m_settings;
+  }
+
+  changeSettings(settings: BrushToolSettings): void {
+    this.m_settings = settings;
+    this.onUpdateSettings();
+  }
+
+  onUpdateSettings() {
+    if (!this.m_canvas)
+      return;
+
+    switch (this.m_settings.type) {
+      case 'pencil':
+        this.m_canvas.freeDrawingBrush = new fabric.PencilBrush(this.m_canvas);
+        break;
+
+      case 'spray':
+        this.m_canvas.freeDrawingBrush = new fabric.SprayBrush(this.m_canvas);
+        break;
+
+      case 'circle':
+        this.m_canvas.freeDrawingBrush = new fabric.CircleBrush(this.m_canvas);
+        break;
+    }
+
+    this.m_canvas.freeDrawingBrush.color = this.m_settings.color;
+    this.m_canvas.freeDrawingBrush.width = this.m_settings.type === 'circle' ? this.m_settings.size - 16 : this.m_settings.size;
+  }
+
+  makeDrawingUnselectable(drawing: { target: fabric.FabricObject }): void {
+    drawing.target.selectable = false;
   }
 }

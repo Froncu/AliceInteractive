@@ -4,7 +4,7 @@ import { Component, defineAsyncComponent } from "vue";
 
 export class TextToolSettings implements BaseToolSettings{
     font = 'Century Gothic';
-    fontSize = 64;
+    fontSize = 32;
     color = '000000'
 }
 

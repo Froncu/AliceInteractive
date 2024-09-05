@@ -15,7 +15,7 @@ export class ShapeTool implements BaseTool {
   private m_canvas?: fabric.Canvas;
   private m_object?: fabric.FabricObject;
   private m_startPosition = { x: 0, y: 0 };
-  private m_minimalSize = { width: 64, height: 64 };
+  private m_minimalSize = { width: 32, height: 32 };
   private m_ratio = 0;
 
   onChosen(canvas: fabric.Canvas): void {

@@ -2,7 +2,7 @@ import { defineComponent, ref, onMounted } from 'vue';
 import WhiteBoard from '@/components/WhiteBoard/WhiteBoard.vue';
 import ToolBar from '@/components/ToolBar/ToolBar.vue';
 import { BaseTool } from '@/components/tools/BaseTool';
-import { SelectTool } from '@/components/tools/SelectTool';
+import { TransformTool } from '@/components/tools/TransformTool';
 import { MoveTool } from '@/components/tools/MoveTool';
 import { ShapeTool } from '@/components/tools/ShapeTool';
 import { BrushTool } from '@/components/tools/BrushTool';
@@ -25,7 +25,7 @@ export default defineComponent({
       new TextTool(),
       new ImageTool(),
       new BackgroundTool(),
-      new SelectTool(),
+      new TransformTool(),
       new MoveTool()
     ];
 

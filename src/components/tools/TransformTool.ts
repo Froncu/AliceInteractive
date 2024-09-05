@@ -1,7 +1,7 @@
 import * as fabric from "fabric";
 import { BaseTool } from "./BaseTool";
 
-export class SelectTool implements BaseTool {
+export class TransformTool implements BaseTool {
     private m_canvas?: fabric.Canvas;
 
     onChosen(canvas: fabric.Canvas): void {

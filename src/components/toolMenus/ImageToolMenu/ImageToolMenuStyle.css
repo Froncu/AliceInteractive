@@ -1,0 +1,64 @@
+.image-tool-menu {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0;
+  }
+  
+  #query {
+    width: 65%;
+    height: auto;
+    font-size: 1vw;
+    text-align: center;
+    border: 1px solid rgb(204, 204, 204);
+  }
+  
+  #search-btn {
+    width: 25%;
+    height: auto;
+    border: 1px solid rgb(204, 204, 204);
+    font-size: 1vw;
+    cursor: pointer;
+  }
+  
+  #search-btn:hover {
+    background-color: rgb(204, 204, 204);
+  }
+  
+  .search-results {
+    height: 60vh;
+    width: 100%;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start; /* Center images horizontally */
+    border: 1px solid #000000;
+  }
+  
+  .photo-item {
+    display: flex;
+    align-items: center;
+    max-width: 45%;
+    padding: 2.5%;
+    overflow: hidden;
+  }
+  
+  .photo-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain; /* Preserve aspect ratio */
+    cursor: pointer;
+  }
+  
+  .photo-item img:hover {
+    transform: scale(1.05); /* Slight zoom effect on hover */
+    transition: transform 0.3s ease;
+  }
+
+  .photo-item.selected {
+    background-color: rgb(204, 204, 204);
+  }
+  

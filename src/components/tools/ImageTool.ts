@@ -1,23 +1,61 @@
-import { BaseTool } from "./BaseTool";
+import * as fabric from 'fabric';
+import { defineAsyncComponent, Component } from "vue";
+import { createClient } from 'pexels';
+import { BaseTool, BaseToolSettings } from "./BaseTool";
+
+export class ImageToolSettings implements BaseToolSettings {
+    photoURL = "";
+    query = "";
+}
 
 export class ImageTool implements BaseTool {
-    onChosen(): void {
+    private m_settings = new ImageToolSettings();
+    private m_canvas?: fabric.Canvas;
+
+    onChosen(canvas: fabric.Canvas): void {
+        this.place = this.place.bind(this);
+
+        this.m_canvas = canvas;
+
+        this.m_canvas.on('mouse:down', this.place);
+
         return;
     }
 
     onUnchosen(): void {
+        this.m_canvas?.off('mouse:down', this.place);
+        this.m_settings.photoURL = "";
+        this.m_settings.query = "";
         return;
     }
 
-    settings(): null {
-        return null;
+    settings(): ImageToolSettings {
+        return this.m_settings;
     }
 
-    changeSettings(): void {
-        return;
+    changeSettings(settings: ImageToolSettings): void {
+        this.m_settings = settings;
+    }
+    menu(): Component {
+        return defineAsyncComponent(() => import('@/components/toolMenus/ImageToolMenu/ImageToolMenu.vue'));
     }
 
-    menu(): null {
-        return null;
+    place(event: fabric.TPointerEventInfo): void {
+        const imgElement = new Image();
+        imgElement.src = this.m_settings.photoURL;
+
+        imgElement.onload = () => {
+            const pexelImage = new fabric.FabricImage(imgElement, {
+                selectable: false,
+                evented: false,
+            });
+
+            pexelImage.set({
+                left: event.viewportPoint.x - pexelImage.width / 2,
+                top: event.viewportPoint.y - pexelImage.height / 2,
+            })
+            this.m_canvas?.add(pexelImage);
+        }
+
     }
 }

@@ -4,6 +4,13 @@
     <option value="Arial">Arial</option>
   </select>
   <div></div>
+  <select id="fontStyles" name="Font Styles" v-model="localSettings.fontStyle">
+    <option value="">Regular</option>
+    <option value="italic">Italic</option>
+    <option value="bold">Bold</option>
+    <option value="italic bold">Italic Bold</option>
+  </select>
+  <div></div>
   <input type="range" min="16" max="256" id="fontSize" v-model="localSettings.fontSize">Size</input>
   <div></div>
   <input type="color" id="color" v-model="localSettings.color">Color</input>

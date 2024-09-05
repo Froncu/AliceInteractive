@@ -1,6 +1,5 @@
 import * as fabric from 'fabric';
 import { defineAsyncComponent, Component } from "vue";
-import { createClient } from 'pexels';
 import { BaseTool, BaseToolSettings } from "./BaseTool";
 
 export class ImageToolSettings implements BaseToolSettings {

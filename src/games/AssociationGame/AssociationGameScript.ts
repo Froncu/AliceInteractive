@@ -31,12 +31,12 @@ export default defineComponent({
 
     onMounted(() => {
       const zone = new InfluenceZone(
-        200, // zoneSize
+        64, // zoneSize
         'Wist je dat ganzen heel graag bananen eten?', // zoneName
         '#FFFAA3', // zoneColor
         'black', // borderColor
         1, // borderSize
-        20, // fontSize
+        16, // fontSize
         'black', // textColor
         'https://kaifolog.ru/uploads/posts/2016-04/1460115572_069.jpg' // zoneImage
       );
@@ -47,8 +47,6 @@ export default defineComponent({
         zone.placeOnCanvas(canvas, { x: whiteBoard.value.canvas().getWidth() / 2, y: whiteBoard.value.canvas().getHeight() * 0.66 });
         zone.placeOnCanvas(canvas, { x: whiteBoard.value.canvas().getWidth() * 0.75, y: whiteBoard.value.canvas().getHeight() / 3 });
       }
-
-
     });
 
     return {

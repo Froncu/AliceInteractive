@@ -39,7 +39,7 @@ export default defineComponent({
       ctx.strokeStyle = localSettings.value.strokeWidth ? localSettings.value.strokeColor : 'transparent';
 
       switch (localSettings.value.shape) {
-        case 'rectangle':
+        case 'rect':
           ctx.fillRect(localSettings.value.strokeWidth / 2,
             localSettings.value.strokeWidth / 2,
             canvas.width - localSettings.value.strokeWidth,
@@ -51,7 +51,7 @@ export default defineComponent({
             canvas.height - localSettings.value.strokeWidth);
           break;
 
-        case 'circle':
+        case 'ellipse':
           ctx.beginPath();
           ctx.arc(canvas.width / 2,
             canvas.height / 2,

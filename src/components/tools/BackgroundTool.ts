@@ -1,43 +1,43 @@
 import * as fabric from "fabric";
 import { BaseTool, BaseToolSettings } from "./BaseTool";
-import { Component, defineAsyncComponent } from "vue";
+import { ref, defineAsyncComponent } from "vue";
 
-export class BackgroundToolSettings implements BaseToolSettings {
+export class BackgroundToolSettings extends BaseToolSettings {
   color = '#808080'
 }
 
-export class BackgroundTool implements BaseTool {
+export class BackgroundTool extends BaseTool {
   private m_canvas?: fabric.Canvas;
-  private m_settings = new BackgroundToolSettings;
+  private m_settings = ref(new BackgroundToolSettings);
 
-  onChosen(canvas: fabric.Canvas): void {
+  override onChosen(canvas: fabric.Canvas) {
     this.fillBackground = this.fillBackground.bind(this);
 
     this.m_canvas = canvas;
     this.m_canvas.on('mouse:down', this.fillBackground);
   }
 
-  onUnchosen(): void {
+  override onUnchosen() {
     this.m_canvas?.off('mouse:down', this.fillBackground);
   }
 
-  menu(): Component {
+  override menu() {
     return defineAsyncComponent(() => import('@/components/toolMenus/BackgroundTool/BackgroundToolMenu.vue'));
   }
 
-  settings(): BackgroundToolSettings {
-    return this.m_settings;
+  override settings()  {
+    return this.m_settings.value;
   }
 
-  changeSettings(setting: BackgroundToolSettings): void {
-    this.m_settings = setting;
+  override changeSettings(settings: BackgroundToolSettings) {
+    this.m_settings.value = settings;
   }
 
-  fillBackground(): void {
+  fillBackground() {
     if (!this.m_canvas)
       return;
 
-    this.m_canvas.backgroundColor = this.m_settings.color;
+    this.m_canvas.backgroundColor = this.m_settings.value.color;
     this.m_canvas.renderAll();
   }
 }

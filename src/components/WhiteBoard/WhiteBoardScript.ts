@@ -15,6 +15,7 @@ export default defineComponent({
 
     onMounted(() => {
       canvasFabric = new fabric.Canvas(props.name);
+      canvasFabric.selectionKey = "ctrlKey";
       canvasFabric.selection = false;
       resizeCanvas();
       window.addEventListener("resize", resizeCanvas);

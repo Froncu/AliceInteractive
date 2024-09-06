@@ -41,7 +41,7 @@ export class ShapeTool extends BaseTool {
     this.m_canvas = canvas;
 
     this.m_canvas.forEachObject((object) => {
-      if (!object.isType('rect') || !object.isType('circle') || !object.isType('triangle'))
+      if (!object.isType('rect') && !object.isType('ellipse') && !object.isType('triangle'))
         return;
 
       object.selectable = true;
@@ -61,7 +61,7 @@ export class ShapeTool extends BaseTool {
       return;
 
     this.m_canvas.forEachObject((object) => {
-      if (!object.isType('rect') || !object.isType('circle') || !object.isType('triangle'))
+      if (!object.isType('rect') && !object.isType('ellipse') && !object.isType('triangle'))
         return;
 
       object.selectable = false;

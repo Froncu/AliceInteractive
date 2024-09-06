@@ -5,6 +5,7 @@ import { ref, defineAsyncComponent } from "vue";
 export class TransformToolSettings extends BaseToolSettings {
   delete = false;
   selectAll = false;
+  group = false;
 }
 
 export class TransformTool extends BaseTool {
@@ -18,7 +19,7 @@ export class TransformTool extends BaseTool {
     this.m_canvas.selection = true;
 
     this.m_canvas.forEachObject((object) => {
-      if (!object.isType(`group`)) {
+      if (object.hasBorders) {
         object.selectable = true;
         object.evented = true;
         object.hasControls = true;
@@ -72,7 +73,42 @@ export class TransformTool extends BaseTool {
       }
     }
   
-    if (this.m_canvas){
+    function groupActiveObjects(canvas: fabric.Canvas) {
+      const activeObjects = canvas.getActiveObjects();
+      
+      if (activeObjects.length > 1) {
+        const activeSelection = new fabric.ActiveSelection(activeObjects, {
+          canvas: canvas
+        });
+        
+        // Calculate the bounding box of the selection
+        const { left, top } = activeSelection.getBoundingRect();
+    
+        // Create a new group with the selected objects
+        const group = new fabric.Group(activeObjects, {
+          left: left, 
+          top: top, 
+          originX: 'left',
+          originY: 'top'
+        });
+    
+        // Remove the individual objects from the canvas
+        activeObjects.forEach(obj => {
+          canvas.remove(obj);
+        });
+    
+        // Add the new group to the canvas
+        canvas.add(group);
+    
+        canvas.discardActiveObject();
+
+        canvas.setActiveObject(group);
+    
+        canvas.renderAll();
+      }
+    }
+    
+    if (this.m_settings.value.selectAll && this.m_canvas){
       selectAllNonGroupObjects(this.m_canvas);
     }
 
@@ -84,6 +120,11 @@ export class TransformTool extends BaseTool {
       this.m_canvas?.discardActiveObject();
       this.m_settings.value.delete = false;
       this.m_canvas?.renderAll();
+    }
+
+    if(this.m_settings.value.group && this.m_canvas){
+      groupActiveObjects(this.m_canvas);
+      this.m_settings.value.group = false;
     }
   }
 }

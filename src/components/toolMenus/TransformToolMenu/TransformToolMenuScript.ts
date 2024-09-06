@@ -20,6 +20,10 @@ export default defineComponent({
         localSettings.value.delete = true;
     };
 
+    const groupObj = () => {
+        localSettings.value.group = true;
+    }
+
     watch(() => localSettings, () => {
       emit('settingsChanged', localSettings.value);
     }, { deep: true })
@@ -27,7 +31,8 @@ export default defineComponent({
     return {
       localSettings,
       selectAll,
-      deleteObj
+      deleteObj,
+      groupObj
     };
   },
 });

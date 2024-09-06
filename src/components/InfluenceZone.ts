@@ -67,6 +67,10 @@ export class InfluenceZone {
 
     // Check if zoneImage is provided
 
+    const groupElements: (fabric.Object | fabric.Textbox | fabric.Image)[] = [];
+    groupElements.push(circle);
+    groupElements.push(text);
+
     if (this.zoneImage) {
       const imgElement = new Image();
       imgElement.src = this.zoneImage;
@@ -91,14 +95,38 @@ export class InfluenceZone {
           top: circle.top + circle.height / 2 + customImage.getScaledHeight()/2,
         });
 
+        groupElements.push(customImage);
+
+        const circleWithText = new fabric.Group(groupElements, {
+          selectable: false,
+          hasBorders: false,
+          hasControls: false,
+          lockMovementX: true,
+          lockMovementY: true,
+          evented: false,
+        });
+
         // Add the image to the canvas
-        canvas.add(customImage);
+        canvas.add(circleWithText);
         canvas.renderAll();
       };
     }
 
-    // Add the influence zone with text to the canvas
-    canvas.add(circleWithText);
-    canvas.renderAll();
+    else {
+      // If no image, create the group with the circle and text only
+      const circleWithText = new fabric.Group(groupElements, {
+        selectable: false,
+        hasBorders: false,
+        hasControls: false,
+        lockMovementX: true,
+        lockMovementY: true,
+        evented: false,
+      });
+
+      // Add the group to the canvas
+      canvas.add(circleWithText);
+      canvas.renderAll();
+    }
+
   }
 }

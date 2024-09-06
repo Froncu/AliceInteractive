@@ -15,17 +15,20 @@ export default defineComponent({
     const client = createClient('P8hl5z3ILCXHdzXqBx1cLMYCN8Lnfb8X778VcuvslCmJCjkCH0SCO1sL');
 
     const photos = ref<Photo[]>([]);
-
     const searchQuery = ref(localSettings.value.query);
     const selectedPhoto = ref<string | null>(null);
+    const currentPage = ref(1);  // Track the current page
+    const totalPages = ref(1);   // Store the total number of pages
 
     const onSearch = () => {
       localSettings.value.query = searchQuery.value;
       emit('settingsChanged', localSettings.value);
 
-      client.photos.search({ query: searchQuery.value, per_page: 12 }).then(response => {
+      // Call the Pexels API with pagination support
+      client.photos.search({ query: searchQuery.value, per_page: 12, page: currentPage.value }).then(response => {
         if ('photos' in response) {
           photos.value = response.photos;
+          totalPages.value = Math.ceil(response.total_results / 12);  // Calculate total pages
         } else {
           console.error('Error fetching data from Pexels API:', response);
         }
@@ -39,6 +42,22 @@ export default defineComponent({
       selectedPhoto.value = url;
     };
 
+    // Handle the next page
+    const nextPage = () => {
+      if (currentPage.value < totalPages.value) {
+        currentPage.value += 1;
+        onSearch();  // Fetch results for the new page
+      }
+    };
+
+    // Handle the previous page
+    const prevPage = () => {
+      if (currentPage.value > 1) {
+        currentPage.value -= 1;
+        onSearch();  // Fetch results for the new page
+      }
+    };
+
     watch(() => localSettings, () => {
       emit('settingsChanged', localSettings.value);
     }, { deep: true });
@@ -48,8 +67,12 @@ export default defineComponent({
       searchQuery,
       photos,
       selectedPhoto,
+      currentPage,
+      totalPages,
       onSearch,
-      handlePhotoSelect
+      handlePhotoSelect,
+      nextPage,
+      prevPage
     };
   },
 });

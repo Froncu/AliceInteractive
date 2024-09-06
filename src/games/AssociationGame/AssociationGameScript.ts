@@ -20,13 +20,13 @@ export default defineComponent({
   setup() {
     const whiteBoard = ref<InstanceType<typeof WhiteBoard>>();
     const tools: BaseTool[] = [
-      new ShapeTool(),
+      new TransformTool(),
+      new MoveTool(),
       new BrushTool(),
+      new ShapeTool(),
       new TextTool(),
       new ImageTool(),
       new BackgroundTool(),
-      new TransformTool(),
-      new MoveTool()
     ];
 
     onMounted(() => {

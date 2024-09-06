@@ -7,11 +7,11 @@ export class ImageToolSettings implements BaseToolSettings {
     query = "";
 }
 
-export class ImageTool implements BaseTool {
+export class ImageTool extends BaseTool {
     private m_settings = new ImageToolSettings();
     private m_canvas?: fabric.Canvas;
 
-    onChosen(canvas: fabric.Canvas): void {
+    override onChosen(canvas: fabric.Canvas): void {
         this.place = this.place.bind(this);
 
         this.m_canvas = canvas;
@@ -21,21 +21,21 @@ export class ImageTool implements BaseTool {
         return;
     }
 
-    onUnchosen(): void {
+    override onUnchosen(): void {
         this.m_canvas?.off('mouse:down', this.place);
         this.m_settings.photoURL = "";
         this.m_settings.query = "";
         return;
     }
 
-    settings(): ImageToolSettings {
+    override settings(): ImageToolSettings {
         return this.m_settings;
     }
 
-    changeSettings(settings: ImageToolSettings): void {
+    override changeSettings(settings: ImageToolSettings): void {
         this.m_settings = settings;
     }
-    menu(): Component {
+    override menu(): Component {
         return defineAsyncComponent(() => import('@/components/toolMenus/ImageToolMenu/ImageToolMenu.vue'));
     }
 

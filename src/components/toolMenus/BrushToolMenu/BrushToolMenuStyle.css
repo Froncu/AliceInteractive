@@ -1,7 +1,7 @@
 .brush-tool-menu {
   position: absolute;
   background-color: white;
-  border: 1px solid #ccc;
+  border: 1px solid rgb(204, 204, 204);
   padding: 10px;
   display: block;
 }

@@ -56,15 +56,6 @@ export class InfluenceZone {
       top: circle.top + circle.height / 2 - text.height / 2,
     });
 
-    const circleWithText = new fabric.Group([circle, text], {
-      selectable: false,
-      hasBorders: false,
-      hasControls: false,
-      lockMovementX: true,
-      lockMovementY: true,
-      evented: false,
-    });
-
     // Check if zoneImage is provided
 
     const groupElements: (fabric.Object | fabric.Textbox | fabric.Image)[] = [];

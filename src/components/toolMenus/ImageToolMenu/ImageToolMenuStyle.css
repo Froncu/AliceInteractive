@@ -4,12 +4,14 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
+    border: 1px solid rgb(204, 204, 204);
     gap: 0;
   }
   
   #query {
     width: 65%;
-    height: auto;
+    height: 5vh;
     font-size: 1vw;
     text-align: center;
     border: 1px solid rgb(204, 204, 204);
@@ -17,7 +19,7 @@
   
   #search-btn {
     width: 25%;
-    height: auto;
+    height: 5vh;
     border: 1px solid rgb(204, 204, 204);
     font-size: 1vw;
     cursor: pointer;
@@ -35,7 +37,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: start; /* Center images horizontally */
-    border: 1px solid #000000;
+    border: 1px solid rgb(204, 204, 204);
   }
   
   .photo-item {

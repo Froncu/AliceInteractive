@@ -2,6 +2,8 @@ import * as fabric from "fabric";
 import { BaseTool } from "./BaseTool";
 
 export class MoveTool extends BaseTool {
+  name = 'Move tool';
+
   private m_canvas?: fabric.Canvas;
   private grabPosition = { x: 0, y: 0 };
   private maxZoom = 4;

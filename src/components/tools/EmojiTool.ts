@@ -8,6 +8,8 @@ export class EmojiToolSettings extends BaseToolSettings {
 }
 
 export class EmojiTool extends BaseTool {
+    name = 'Emoji tool';
+
     private m_settings = new EmojiToolSettings();
     private m_canvas?: fabric.Canvas;
 

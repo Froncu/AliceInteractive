@@ -4,6 +4,8 @@ import { Canvas } from "fabric/*";
 export abstract class BaseToolSettings { }
 
 export abstract class BaseTool {
+  abstract name: string;
+
   abstract onChosen(canvas: Canvas): void;
   abstract onUnchosen(): void;
 

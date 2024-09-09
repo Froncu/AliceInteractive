@@ -1,0 +1,33 @@
+<div class="emoji-tool-menu">
+  <!-- Search input with a search button -->
+  <input type="text" placeholder="Search for emojis" v-model="localSettings.query" />
+  <button @click="searchEmojis">Search</button>
+
+  <!-- Display category buttons -->
+  <div class="emoji-categories">
+    <button 
+      v-for="category in categories" 
+      :key="category.name" 
+      @click="selectCategory(category.name)" 
+      :class="{ 'selected': selectedCategory === category.name }"
+    >
+      {{ category.name }}
+    </button>
+  </div>
+
+  <!-- Display emojis for the selected category -->
+  <div v-if="filteredEmojis.length" class="emoji-list">
+    <div v-for="emoji in filteredEmojis" :key="emoji.hexcode" class="emoji-item">
+      <img 
+        :src="getEmojiUrl(emoji.hexcode)" 
+        @click="selectEmoji(emoji)" 
+        @error="handleImageError(emoji)" 
+      />
+    </div>
+  </div>
+
+  <!-- Optionally, display a message if no category is selected or no emojis found -->
+  <div v-else>
+    <p>Select a category or search for emojis</p>
+  </div>
+</div>

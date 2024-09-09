@@ -11,6 +11,7 @@
     "core-js": "^3.8.3",
     "fabric": "^6.4.1",
     "firebase": "^10.13.1",
+    "openmoji": "^15.0.0",
     "pexels": "^1.4.0",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",

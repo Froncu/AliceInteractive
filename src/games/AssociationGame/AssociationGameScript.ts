@@ -10,6 +10,7 @@ import { BackgroundTool } from '@/components/tools/BackgroundTool';
 import { TextTool } from '@/components/tools/TextTool';
 import { ImageTool } from '@/components/tools/ImageTool';
 import { InfluenceZone } from '@/components/InfluenceZone';
+import { EmojiTool } from '@/components/tools/EmojiTool';
 
 export default defineComponent({
   name: 'AssociationGame',
@@ -27,6 +28,7 @@ export default defineComponent({
       new TextTool(),
       new ImageTool(),
       new BackgroundTool(),
+      new EmojiTool()
     ];
 
     onMounted(() => {

@@ -1,0 +1,35 @@
+.emoji-tool-menu {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgb(204, 204, 204);
+}
+
+.emoji-categories {
+  display: flex;
+  flex-wrap: wrap;
+  height: 30vh;
+  border: 1px solid rgb(204, 204, 204);
+}
+
+.emoji-list {
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  height: 30vh;
+  border: 1px solid rgb(204, 204, 204);
+}
+
+.emoji-item {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+button.selected {
+  background-color: #d0d0d0;
+  font-weight: bold;
+}

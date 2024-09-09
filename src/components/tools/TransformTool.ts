@@ -15,7 +15,6 @@ export class TransformTool extends BaseTool {
   override onChosen(canvas: fabric.Canvas) {
     this.m_canvas = canvas;
 
-    this.m_canvas.selectionKey = "ctrlKey";
     this.m_canvas.selection = true;
 
     this.m_canvas.forEachObject((object) => {

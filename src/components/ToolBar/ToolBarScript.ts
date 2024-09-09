@@ -1,6 +1,7 @@
 import { defineComponent, Component, PropType, shallowRef } from 'vue';
 import { BaseTool, BaseToolSettings } from '../tools/BaseTool';
 import WhiteBoard from '../WhiteBoard/WhiteBoard.vue';
+import ShapeToolMenu from '../toolMenus/ShapeToolMenu/ShapeToolMenu.vue';
 
 export default defineComponent({
   name: 'ToolBar',
@@ -20,7 +21,7 @@ export default defineComponent({
     const activeToolSettings = shallowRef<BaseToolSettings | null>();
 
     function onClick(toolConstructorName: string) {
-      const foundTool = props.tools.find((tool) => { return tool.constructor.name === toolConstructorName; });
+      const foundTool = props.tools.find((tool) => { return tool.name === toolConstructorName; });
       if (activeTool === foundTool)
         return;
 

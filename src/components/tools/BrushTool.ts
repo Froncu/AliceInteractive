@@ -9,6 +9,8 @@ export class BrushToolSettings extends BaseToolSettings {
 }
 
 export class BrushTool extends BaseTool {
+  name = 'Brush tool';
+
   private m_canvas?: fabric.Canvas;
   private m_settings = ref(new BrushToolSettings);
 

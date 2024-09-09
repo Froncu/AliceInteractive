@@ -7,6 +7,8 @@ export class BackgroundToolSettings extends BaseToolSettings {
 }
 
 export class BackgroundTool extends BaseTool {
+  name = 'Background tool';
+
   private m_canvas?: fabric.Canvas;
   private m_settings = ref(new BackgroundToolSettings);
 

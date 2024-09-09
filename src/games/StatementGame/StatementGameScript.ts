@@ -1,4 +1,5 @@
 import { defineComponent, ref, onMounted } from 'vue';
+import { getStorage, ref as storageRef, getDownloadURL } from 'firebase/storage';
 import DilemmaCard from '@/components/DilemmaCard/DilemmaCard.vue';
 import PlaceHolder from '@/components/PlaceHolder/PlaceHolder.vue';
 import ChoiceTimer from '@/components/ChoiceTimer/ChoiceTimer.vue';
@@ -19,7 +20,7 @@ export default defineComponent({
       rightPlaceholderImage: string;
       rightPlaceholderText: string;
     }[] = [];
- 
+
     const currentIndex = ref<number>(0);
     const imagePath = ref<string | undefined>(undefined);
     const textContent = ref<string>('Loading...');
@@ -38,11 +39,21 @@ export default defineComponent({
 
     const choiceTimer = ref<InstanceType<typeof ChoiceTimer> | null>();
 
+    const assetsDirectory = 'Test01/DilemmaGame/';
+    const storage = getStorage();
+
     const fetchData = async () => {
       try {
-        const response = await fetch('/assets/StatementGame/cardData.json');
+        const fileRef = storageRef(storage, assetsDirectory + 'cardData.json');
+        const url = await getDownloadURL(fileRef);
+
+        const response = await fetch(url);
         const data = await response.json();
         cardData = data;
+
+        for (const card of cardData)
+          await loadData(card);
+
         loadNextCard();
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -50,23 +61,36 @@ export default defineComponent({
       }
     };
 
+    async function loadData(card: typeof cardData[0]) {
+      let fileRef = storageRef(storage, assetsDirectory + card.imagePath);
+      card.imagePath = await getDownloadURL(fileRef);
+
+      fileRef = storageRef(storage, assetsDirectory + card.leftPlaceholderImage);
+      card.leftPlaceholderImage = await getDownloadURL(fileRef);
+
+      fileRef = storageRef(storage, assetsDirectory + card.rightPlaceholderImage);
+      card.rightPlaceholderImage = await getDownloadURL(fileRef);
+    }
+
     function loadNextCard() {
       if (choiceTimer.value)
         choiceTimer.value.reset(true);
 
-      if (currentIndex.value < cardData.length) {
-        const currentCard = cardData[currentIndex.value];
-        imagePath.value = currentCard.imagePath;
-        textContent.value = currentCard.textContent;
-        leftPlaceholderImage.value = currentCard.leftPlaceholderImage;
-        leftPlaceholderText.value = currentCard.leftPlaceholderText;
-        rightPlaceholderImage.value = currentCard.rightPlaceholderImage;
-        rightPlaceholderText.value = currentCard.rightPlaceholderText;
-        currentIndex.value++;
-      } else {
+      if (currentIndex.value >= cardData.length) {
         textContent.value = 'No more cards!';
         saveAnswersToFile();
+        return;
       }
+
+      const currentCard = cardData[currentIndex.value];
+
+      imagePath.value = currentCard.imagePath;
+      textContent.value = currentCard.textContent;
+      leftPlaceholderImage.value = currentCard.leftPlaceholderImage;
+      leftPlaceholderText.value = currentCard.leftPlaceholderText;
+      rightPlaceholderImage.value = currentCard.rightPlaceholderImage;
+      rightPlaceholderText.value = currentCard.rightPlaceholderText;
+      currentIndex.value++;
     }
 
     function onChoiceMade(placeholder: { image: string | undefined, text: string }) {

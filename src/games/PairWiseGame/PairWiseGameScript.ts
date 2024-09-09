@@ -1,7 +1,8 @@
-import { defineComponent, ref, onMounted} from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import CardItem from '@/components/CardItem/CardItem.vue';
 import BackGround from '@/components/Background/BackGround.vue';
 import ChoiceTimer from '@/components/ChoiceTimer/ChoiceTimer.vue';
+import { getStorage, ref as storageRef, getDownloadURL } from 'firebase/storage';
 
 interface Card {
   id: number;
@@ -27,19 +28,35 @@ export default defineComponent({
     const choiceTimer = ref<InstanceType<typeof ChoiceTimer> | null>();
     const useTimer = ref(true);
 
-    onMounted(async () => {
-      if (choiceTimer.value)
-        choiceTimer.value.start();
+    const storage = getStorage();
 
-      const response = await fetch('/assets/PairWiseGame/cards.json'); // Ensure the path is correct
-      if (!response.ok) {
-        console.error(`Failed to fetch cards: ${response.statusText}`);
-        return;
+    onMounted(async () => {
+      if (choiceTimer.value) choiceTimer.value.start();
+
+      try {
+        const assetsDirectory = 'Test01/PairWiseGame/';
+        let fileRef = storageRef(storage, assetsDirectory + 'cards.json');
+        const url = await getDownloadURL(fileRef);
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          console.error(`Failed to fetch cards: ${response.statusText}`);
+          return;
+        }
+        
+        const data = await response.json();
+        cards.value = data.cardItems;
+        cards.value.forEach(async (card) => {
+          fileRef = storageRef(storage, assetsDirectory + card.imagePath);
+          card.imagePath = await getDownloadURL(fileRef);
+        });
+
+        sortedCards.value = await quickSort(cards.value);
+        finishGame();
+      } catch (error) {
+        console.error('Error fetching file from Firebase Storage:', error);
       }
-      const data = await response.json();
-      cards.value = data.cardItems;
-      sortedCards.value = await quickSort(cards.value); // Start the quicksort
-      finishGame();
     });
 
     function handleTimeUp() {

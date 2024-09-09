@@ -13,9 +13,6 @@ export default defineComponent({
     const localSettings = ref({ ...props.settings })
 
     watch(() => localSettings, () => {
-      const input = (document.getElementById("strokeWidth") as HTMLInputElement).value;
-      localSettings.value.strokeWidth = parseInt(input, 0);
-
       updatePreview();
       emit('settingsChanged', localSettings.value);
     }, { deep: true })
@@ -74,7 +71,13 @@ export default defineComponent({
       }
     }
 
+    function onStrokeWidthChange() {
+      const input = (document.getElementById("strokeWidth") as HTMLInputElement).value;
+      localSettings.value.strokeWidth = parseInt(input, 0);
+    }
+
     return {
+      onStrokeWidthChange,
       localSettings
     };
   },

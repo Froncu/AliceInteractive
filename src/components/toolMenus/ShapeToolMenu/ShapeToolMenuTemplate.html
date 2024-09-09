@@ -7,7 +7,7 @@
   <div></div>
   <input type="color" id="fillColor" v-model="localSettings.fillColor">Fill Color</input>
   <div></div>
-  <input type="range" min="0" max="16" id="strokeWidth" v-model="localSettings.strokeWidth">Stroke Width</input>
+  <input type="range" min="0" max="16" id="strokeWidth" @input="onStrokeWidthChange" v-model="localSettings.strokeWidth">Stroke Width</input>
   <div></div>
   <input type="color" id="strokeColor" v-model="localSettings.strokeColor">Stroke Color</input>
   <div></div>

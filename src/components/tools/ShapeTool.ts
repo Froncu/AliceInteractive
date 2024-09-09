@@ -32,7 +32,7 @@ export class ShapeTool extends BaseTool {
       const position = { x: this.m_object.left, y: this.m_object.top };
       const size = { width: this.m_object.width, height: this.m_object.height };
       this.m_canvas?.remove(this.m_object);
-      this.m_object = this.createObject(position, size);
+      this.m_object = this.createObject(position, size, true);
 
       this.m_canvas?.add(this.m_object);
       this.m_canvas?.renderAll();
@@ -92,7 +92,7 @@ export class ShapeTool extends BaseTool {
     this.m_settings.value = settings;
   }
 
-  createObject(position: { x: number, y: number }, size: { width: number, height: number }) {
+  createObject(position: { x: number, y: number }, size: { width: number, height: number }, selectable: boolean) {
     let shapeType: typeof fabric.FabricObject;
     switch (this.m_settings.value.shape) {
       case 'rect':
@@ -112,8 +112,8 @@ export class ShapeTool extends BaseTool {
     }
 
     const object = new shapeType({
-      evented: false,
-      selectable: false,
+      evented: selectable,
+      selectable: selectable,
       hasControls: false,
       lockMovementX: true,
       lockMovementY: true,
@@ -156,14 +156,13 @@ export class ShapeTool extends BaseTool {
     }
     else {
       this.m_startPosition = event.scenePoint;
-      this.m_object = this.createObject(event.scenePoint, this.m_minimalSize);
+      this.m_object = this.createObject(event.scenePoint, this.m_minimalSize, false);
       this.m_canvas.add(this.m_object);
+      this.m_canvas.on('mouse:move', this.drag);
     }
 
     this.m_canvas.setActiveObject(this.m_object);
     this.m_canvas.renderAll();
-
-    this.m_canvas.on('mouse:move', this.drag);
   }
 
   drag(event: fabric.TPointerEventInfo) {

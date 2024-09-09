@@ -74,5 +74,6 @@ export class BrushTool extends BaseTool {
 
   makeDrawingUnselectable(drawing: { target: fabric.FabricObject }) {
     drawing.target.selectable = false;
+    drawing.target.evented = false;
   }
 }

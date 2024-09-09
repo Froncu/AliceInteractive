@@ -12,9 +12,13 @@ export class BrushTool extends BaseTool {
   private m_canvas?: fabric.Canvas;
   private m_settings = ref(new BrushToolSettings);
 
-  override onChosen(canvas: fabric.Canvas) {
-    this.makeDrawingUnselectable = this.makeDrawingUnselectable.bind(this)
+  constructor() {
+    super();
 
+    this.makeDrawingUnselectable = this.makeDrawingUnselectable.bind(this)
+  }
+
+  override onChosen(canvas: fabric.Canvas) {
     this.m_canvas = canvas;
     this.m_canvas.isDrawingMode = true;
     this.onUpdateSettings();
@@ -40,6 +44,7 @@ export class BrushTool extends BaseTool {
 
   override changeSettings(settings: BrushToolSettings) {
     this.m_settings.value = settings;
+    this.onUpdateSettings();
   }
 
   onUpdateSettings() {

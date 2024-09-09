@@ -1,7 +1,7 @@
 .card-item {
   width: 20vw;
   height: calc(20vw * (4/3));
-  background-image: url('/public/assets/PairWiseGame/backimage.png');
+  background-image: url('https://firebasestorage.googleapis.com/v0/b/alicedownrabithole.appspot.com/o/Test01%2FPairWiseGame%2Fbackimage.png?alt=media&token=167ff305-5da2-4f3c-b5c3-7a431b972c0b');
   background-size: cover;
   border-radius: 10%;
   box-shadow: 6px 6px 7px 7px rgba(0, 0, 0, 0.416); 

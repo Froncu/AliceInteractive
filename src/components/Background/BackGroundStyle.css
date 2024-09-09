@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url('/public/assets/PairWiseGame/backgroundtile.png');
+  background-image: url('https://firebasestorage.googleapis.com/v0/b/alicedownrabithole.appspot.com/o/Test01%2FPairWiseGame%2Fbackgroundtile.png?alt=media&token=288e6b7b-982b-4e4a-9b35-bdfb70a62bd9');
   background-repeat: repeat;
   background-position: center center;
   background-size: 1250px 722.25px; /* Adjust the size to control how many times the image repeats */

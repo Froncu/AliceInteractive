@@ -4,3 +4,15 @@
   height: 100%;
   z-index: 0;
 }
+
+.place-holder-left {
+  top: 55%;
+  left: 20%;
+  rotate: -6deg;
+}
+
+.place-holder-right {
+  top: 55%;
+  left: 80%;
+  rotate: 6deg;
+}

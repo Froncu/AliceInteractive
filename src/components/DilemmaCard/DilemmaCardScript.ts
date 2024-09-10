@@ -83,12 +83,16 @@ export default defineComponent({
 
       const [leftPlaceholder, rightPlaceholder] = placeholders;
 
-      const leftRotation = parseFloat(leftPlaceholder.style.rotate);
-      const rightRotation = parseFloat(rightPlaceholder.style.rotate);
-
-      const cardCenterX = parseInt(window.getComputedStyle(cardElement.value).left);
-      const leftCenterX = parseInt(window.getComputedStyle(leftPlaceholder).left);
-      const rightCenterX = parseInt(window.getComputedStyle(rightPlaceholder).left);
+      const computedStyleLeft = window.getComputedStyle(leftPlaceholder);
+      const computedStyleRight = window.getComputedStyle(rightPlaceholder);
+      
+      const leftRotation = parseFloat(computedStyleLeft.rotate);
+      const rightRotation = parseFloat(computedStyleRight.rotate);
+      
+      const computedStyleCenter = window.getComputedStyle(cardElement.value);
+      const cardCenterX = parseInt(computedStyleCenter.left);
+      const leftCenterX = parseInt(computedStyleLeft.left);
+      const rightCenterX = parseInt(computedStyleRight.left);
 
       const distanceFromLeft = cardCenterX - leftCenterX;
       const totalDistance = rightCenterX - leftCenterX;
@@ -104,7 +108,7 @@ export default defineComponent({
 
       const placeholders = document.querySelectorAll<HTMLElement>('.place-holder');
       const cardRect = cardElement.value.getBoundingClientRect();
-      const overlappingPlaceholder = ref<HTMLElement | null>(null);
+      const overlappingPlaceholder = ref<HTMLElement>();
       placeholders.forEach((placeholder) => {
         const placeholderRect = placeholder.getBoundingClientRect();
 
@@ -117,21 +121,24 @@ export default defineComponent({
         }
       });
 
-      if (overlappingPlaceholder.value) {
-        cardElement.value.style.left = overlappingPlaceholder.value.style.left;
-        cardElement.value.style.top = overlappingPlaceholder.value.style.top;
+      cardElement.value.style.transition = "rotate 0.5s ease, left 0.5s ease, top 0.5s ease";
+      cardElement.value.addEventListener('transitionend', onTransitionEnd);
 
-        const placeholderRotation = parseFloat(overlappingPlaceholder.value.style.rotate);
+      if (overlappingPlaceholder.value) {
+        const computedStyle = window.getComputedStyle(overlappingPlaceholder.value);
+        cardElement.value.style.left = computedStyle.left;
+        cardElement.value.style.top = computedStyle.top;
+
+        const placeholderRotation = parseFloat(computedStyle.rotate);
         cardElement.value.style.rotate = `${placeholderRotation}deg`;
+
+        console.log(overlappingPlaceholder.value.style);
       }
       else {
         cardElement.value.style.left = '50%';
         cardElement.value.style.top = '70%';
         cardElement.value.style.rotate = '';
       }
-
-      cardElement.value.style.transition = "rotate 0.5s ease, left 0.5s ease, top 0.5s ease";
-      cardElement.value.addEventListener('transitionend', onTransitionEnd);
 
       window.removeEventListener('mousemove', drag);
       window.removeEventListener('touchmove', drag);

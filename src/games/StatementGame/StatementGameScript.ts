@@ -1,114 +1,109 @@
 import { defineComponent, ref, onMounted } from 'vue';
-import { getStorage, ref as storageRef, getDownloadURL } from 'firebase/storage';
+import { getStorage, getDownloadURL, ref as storageRef } from 'firebase/storage';
+import LoadingScreen from '@/components/LoadingScreen/LoadingScreen.vue';
 import DilemmaCard from '@/components/DilemmaCard/DilemmaCard.vue';
 import PlaceHolder from '@/components/PlaceHolder/PlaceHolder.vue';
 import ChoiceTimer from '@/components/ChoiceTimer/ChoiceTimer.vue';
 
+class Round {
+  centerImage = '';
+  centerText = '';
+  leftImage = '';
+  leftText = '';
+  rightImage = '';
+  rightText = '';
+}
+
 export default defineComponent({
   name: 'StatementGame',
   components: {
+    LoadingScreen,
     DilemmaCard,
     PlaceHolder,
     ChoiceTimer
   },
   setup() {
-    let cardData: {
-      imagePath: string;
-      textContent: string;
-      leftPlaceholderImage: string;
-      leftPlaceholderText: string;
-      rightPlaceholderImage: string;
-      rightPlaceholderText: string;
-    }[] = [];
-
-    const currentIndex = ref<number>(0);
-    const imagePath = ref<string | undefined>(undefined);
-    const textContent = ref<string>('Loading...');
-    const leftPlaceholderImage = ref<string | undefined>(undefined);
-    const leftPlaceholderText = ref<string | undefined>(undefined);
-    const rightPlaceholderImage = ref<string | undefined>(undefined);
-    const rightPlaceholderText = ref<string | undefined>(undefined);
+    let rounds = new Array<Round>;
+    let roundIndex = -1;
+    const round = ref(new Round);
 
     const answers: {
-      givenImageSource: string | undefined;
+      givenImage: string;
       givenText: string;
-      chosenImageSource: string | undefined;
+      chosenImage: string;
       chosenText: string;
       secondsTaken: number;
     }[] = [];
 
-    const choiceTimer = ref<InstanceType<typeof ChoiceTimer> | null>();
-
+    const choiceTimer = ref<InstanceType<typeof ChoiceTimer>>();
     const assetsDirectory = 'Test01/DilemmaGame/';
-    const storage = getStorage();
+    const isLoading = ref(true);
 
-    const fetchData = async () => {
+    onMounted(async () => {
+      await fetchData();
+      choiceTimer.value?.start();
+    });
+
+    async function fetchData() {
       try {
+        const storage = getStorage();
         const fileRef = storageRef(storage, assetsDirectory + 'cardData.json');
         const url = await getDownloadURL(fileRef);
 
         const response = await fetch(url);
         const data = await response.json();
-        cardData = data;
+        rounds = data;
 
-        for (const card of cardData)
-          await loadData(card);
+        for (const round of rounds) {
+          let fileRef = storageRef(storage, assetsDirectory + round.centerImage);
+          round.centerImage = await getDownloadURL(fileRef);
 
-        loadNextCard();
+          fileRef = storageRef(storage, assetsDirectory + round.leftImage);
+          round.leftImage = await getDownloadURL(fileRef);
+
+          fileRef = storageRef(storage, assetsDirectory + round.rightImage);
+          round.rightImage = await getDownloadURL(fileRef);
+        }
+
+        incrementRound();
+        isLoading.value = false;
+        
       } catch (error) {
         console.error('Error fetching data:', error);
-        textContent.value = 'Error loading data.';
       }
-    };
-
-    async function loadData(card: typeof cardData[0]) {
-      let fileRef = storageRef(storage, assetsDirectory + card.imagePath);
-      card.imagePath = await getDownloadURL(fileRef);
-
-      fileRef = storageRef(storage, assetsDirectory + card.leftPlaceholderImage);
-      card.leftPlaceholderImage = await getDownloadURL(fileRef);
-
-      fileRef = storageRef(storage, assetsDirectory + card.rightPlaceholderImage);
-      card.rightPlaceholderImage = await getDownloadURL(fileRef);
     }
 
-    function loadNextCard() {
-      if (choiceTimer.value)
-        choiceTimer.value.reset(true);
-
-      if (currentIndex.value >= cardData.length) {
-        textContent.value = 'No more cards!';
-        saveAnswersToFile();
-        return;
-      }
-
-      const currentCard = cardData[currentIndex.value];
-
-      imagePath.value = currentCard.imagePath;
-      textContent.value = currentCard.textContent;
-      leftPlaceholderImage.value = currentCard.leftPlaceholderImage;
-      leftPlaceholderText.value = currentCard.leftPlaceholderText;
-      rightPlaceholderImage.value = currentCard.rightPlaceholderImage;
-      rightPlaceholderText.value = currentCard.rightPlaceholderText;
-      currentIndex.value++;
+    function incrementRound() {
+      choiceTimer.value?.reset(true);
+      round.value = rounds[++roundIndex];
     }
 
-    function onChoiceMade(placeholder: { image: string | undefined, text: string }) {
-      if (imagePath.value === undefined || !choiceTimer.value)
+    function onChoiceMade(placeholder: { image: string, text: string }) {
+      if (!choiceTimer.value)
         return;
+
+      if (roundIndex >= rounds.length - 1) {
+        if (roundIndex === rounds.length - 1) {
+          saveAnswersToFile();
+          ++roundIndex;
+          choiceTimer.value.reset(false);
+        }
+
+        return;
+      }
 
       answers.push({
-        givenImageSource: imagePath.value,
-        givenText: textContent.value,
-        chosenImageSource: placeholder.image,
+        givenImage: round.value.centerImage,
+        givenText: round.value.centerText,
+        chosenImage: placeholder.image,
         chosenText: placeholder.text,
         secondsTaken: choiceTimer.value.startSeconds - choiceTimer.value.secondsRemaining()
       });
 
-      loadNextCard();
+      incrementRound();
     }
 
-    const saveAnswersToFile = () => {
+    function saveAnswersToFile() {
       const fileData = JSON.stringify(answers, null, 2);
       const blob = new Blob([fileData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -117,48 +112,26 @@ export default defineComponent({
       a.download = 'answers.json';
       a.click();
       URL.revokeObjectURL(url);
-    };
+    }
 
-    const handleTimeUp = () => {
-      answers.push(
-        {
-          givenImageSource: "null",
-          givenText: "null",
-          chosenImageSource: "null",
-          chosenText: "null",
-          secondsTaken: 0
-        }
-      )
-      loadNextCard();
-    };
+    function onTimeUp() {
+      answers.push({
+        givenImage: 'null',
+        givenText: 'null',
+        chosenImage: 'null',
+        chosenText: 'null',
+        secondsTaken: 0
+      });
 
-    onMounted(() => {
-      fetchData();
-      const placeholders = document.querySelectorAll('.place-holder') as NodeListOf<HTMLElement>;
-
-      if (placeholders.length === 2) {
-        const [leftPlaceholder, rightPlaceholder] = placeholders;
-
-        leftPlaceholder.style.top = '55%';
-        leftPlaceholder.style.left = '20%';
-        leftPlaceholder.style.rotate = '-6deg';
-
-        rightPlaceholder.style.top = '55%';
-        rightPlaceholder.style.left = '80%';
-        rightPlaceholder.style.rotate = '6deg';
-      }
-    });
+      incrementRound();
+    }
 
     return {
-      imagePath,
-      textContent,
-      leftPlaceholderImage,
-      leftPlaceholderText,
-      rightPlaceholderImage,
-      rightPlaceholderText,
+      round,
       choiceTimer,
+      isLoading,
       onChoiceMade,
-      handleTimeUp
+      onTimeUp
     };
   }
 });

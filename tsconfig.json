@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",  // Add this line to specify where the compiled JS files go
     "target": "esnext",
     "module": "esnext",
     "strict": true,
@@ -16,8 +17,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env",
-      "jquery"
+      "webpack-env"
     ],
     "paths": {
       "@/*": [

@@ -1,73 +1,96 @@
-import { defineAsyncComponent, Component, watch } from 'vue';
 import * as fabric from 'fabric';
 import { BaseTool, BaseToolSettings } from '@/components/tools/BaseTool';
+import { ref, defineAsyncComponent, watch } from 'vue';
+import { getStorage, ref as storageRef, getDownloadURL, StorageReference } from 'firebase/storage';
 
 export class EmojiToolSettings extends BaseToolSettings {
-    query = '';
-    chosenEmoji = '';  // Store the emoji URL here
+  query = "";
+  chosenEmoji = ""; // This will store the selected emoji character like "😀"
+  emojis: Record<string, any> = {}; // This will store the emoji data from the JSON file
 }
 
 export class EmojiTool extends BaseTool {
-    name = 'Emoji tool';
+  name = 'Emoji tool';
 
-    private m_settings = new EmojiToolSettings();
-    private m_canvas?: fabric.Canvas;
+  private m_fileRef?: StorageReference;
+  private m_settings = new EmojiToolSettings();
+  private m_canvas?: fabric.Canvas;
 
-    override onChosen(canvas: fabric.Canvas): void {
-        this.m_canvas = canvas;
+  private m_storage = getStorage();
 
-        this.place = this.place.bind(this);
+  override async onChosen(canvas: fabric.Canvas): Promise<void> {
+    try {
+      const assetsDirectory = 'Test01/AssociationGame/';
+      this.m_fileRef = storageRef(this.m_storage, assetsDirectory + 'emojis.json');
+      const url = await getDownloadURL(this.m_fileRef);
 
-        this.m_canvas = canvas;
+      const response = await fetch(url);
 
-        this.m_canvas.on('mouse:down', this.place);
-
+      if (!response.ok) {
+        console.error(`Failed to fetch emojis: ${response.statusText}`);
         return;
+      }
+
+      const emojiData = await response.json();
+      this.m_settings.emojis = emojiData.emojis; // Save emoji data into settings
+
+      // Emit the settings change to make sure categories are updated in the menu
+      this.changeSettings(this.m_settings);
+
+    } catch (error) {
+      console.error('Error fetching file from Firebase Storage:', error);
     }
 
-    override onUnchosen(): void {
-        this.m_canvas?.off('mouse:down', this.place);
-        this.m_settings.chosenEmoji = "";
-        this.m_settings.query = "";
-        return;
+    this.m_canvas = canvas;
+
+    // Bind placeEmoji method to the class instance
+    this.placeEmoji = this.placeEmoji.bind(this);
+    this.m_canvas.on('mouse:down', this.placeEmoji);
+  }
+
+  override onUnchosen(): void {
+    this.m_canvas?.off('mouse:down', this.placeEmoji);
+    this.m_settings.chosenEmoji = "";
+    this.m_settings.query = "";
+  }
+
+  override menu() {
+    return defineAsyncComponent(() => import('@/components/toolMenus/EmojiToolMenu/EmojiToolMenu.vue'));
+  }
+
+  override settings(): EmojiToolSettings {
+    return this.m_settings;
+  }
+
+  override changeSettings(settings: EmojiToolSettings) {
+    this.m_settings = settings;
+  }
+
+  private placeEmoji(event: fabric.TPointerEventInfo) {
+    if (!this.m_settings.chosenEmoji) {
+      console.error('No emoji selected.');
+      return;
     }
 
-    override menu(): Component | null {
-        return defineAsyncComponent(() => import('@/components/toolMenus/EmojiToolMenu/EmojiToolMenu.vue'));
-    }
+    // Create a fabric.Text object for the selected emoji
+    const emojiText = new fabric.Textbox(this.m_settings.chosenEmoji, {
+      selectable: false,
+      evented: false,
+      editable: false,
+    });
 
-    override settings(): EmojiToolSettings | null {
-        return this.m_settings;
-    }
+    const groupArr: fabric.FabricObject[] = [emojiText];
 
-    override changeSettings(settings: EmojiToolSettings) {
-        this.m_settings = settings;
-    }
+    const emojiGroup = new fabric.Group(groupArr, {
+      selectable: false,
+    });
 
+    emojiGroup.set({
+      left: event.viewportPoint.x - emojiGroup.width / 2,
+      top: event.viewportPoint.y - emojiGroup.height / 2,
+    });
 
-    private place(event: fabric.TPointerEventInfo) {
-        if (!this.m_canvas) return;
-        console.log("hey")
-
-        // Create a fabric image object from the emoji URL and add it to the canvas
-        
-        //fabric.loadSVGFromURL("image.svg",function(objects,options)
-        
-        /* const emojiElement = new Image;
-        emojiElement. = fabric.loadSVGFromURL('https://openmoji.org/data/color/svg/1F5FD.svg'); //this.m_settings.chosenEmoji;
-
-        emojiElement.onload = () => {
-            const emoji = new fabric.FabricImage(emojiElement, {
-                selectable: false,
-                evented: false,
-            });
-
-            emoji.set({
-                left: event.viewportPoint.x - emoji.width / 2,
-                top: event.viewportPoint.y - emoji.height / 2,
-            })
-            this.m_canvas?.add(emoji);
-            this.m_canvas?.renderAll;
-        }; */
-    }
+    this.m_canvas?.add(emojiGroup);
+    this.m_canvas?.renderAll();
+  }
 }

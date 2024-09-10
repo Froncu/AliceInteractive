@@ -1,95 +1,96 @@
 import { defineComponent, ref, watch, onMounted } from 'vue';
 import { EmojiToolSettings } from '@/components/tools/EmojiTool';
-import emojiData from 'openmoji/data/openmoji.json';
-
-interface Emoji {
-  hexcode: string;
-  annotation: string;
-  group: string;
-}
-
-interface EmojiCategory {
-  name: string;
-  emojis: Emoji[];
-}
 
 export default defineComponent({
   name: 'EmojiToolMenu',
   props: {
     settings: {
-      type: EmojiToolSettings,
+      type: Object as () => EmojiToolSettings,
       required: true
     }
   },
   setup(props, { emit }) {
     const localSettings = ref({ ...props.settings });
-    const emojis = ref<Emoji[]>(emojiData);
-    const categories = ref<EmojiCategory[]>([]);
-    const filteredEmojis = ref<Emoji[]>([]);
     const selectedCategory = ref<string | null>(null);
+    const filteredEmojis = ref<any[]>([]); // Holds emojis for the selected category
+    const categories = ref<Record<string, any[]>>({}); // Holds categories with arrays of emojis
 
+    const ensureCategoriesLoaded = () => {
+      // This function will check if categories are populated, and if not, load them
+      if (Object.keys(categories.value).length === 0) {
+        categorizeEmojis();
+      }
+    };
+
+    // Load the emojis and categorize them on component mount
     onMounted(() => {
-      categorizeEmojis();
+      ensureCategoriesLoaded();
     });
 
     const categorizeEmojis = () => {
-      const categoryMap: { [key: string]: Emoji[] } = {};
-      emojis.value.forEach((emoji: Emoji) => {
-        if (!categoryMap[emoji.group]) {
-          categoryMap[emoji.group] = [];
-        }
-        categoryMap[emoji.group].push(emoji);
-      });
+      const emojiData = localSettings.value.emojis; // Assuming the emoji data is in localSettings
 
-      categories.value = Object.keys(categoryMap).map(categoryName => ({
-        name: categoryName,
-        emojis: categoryMap[categoryName]
-      }));
+      if (!emojiData || Object.keys(emojiData).length === 0) {
+        console.error('No emoji data found');
+        return;
+      }
+
+      // Iterate through categories and create arrays of emojis for each category
+      for (const [category, subcategories] of Object.entries(emojiData)) {
+        const emojiArray: any[] = [];
+
+        // Ensure subcategories is iterable (Array or Object.values)
+        for (const subcategory of Object.values(subcategories)) {
+          if (Array.isArray(subcategory)) {
+            emojiArray.push(...subcategory); // Push all emojis from subcategories
+          }
+        }
+
+        categories.value[category] = emojiArray; // Set the category array
+      }
     };
 
-    const selectCategory = (categoryName: string) => {
-      selectedCategory.value = categoryName;
-      filteredEmojis.value = categories.value.find(category => category.name === categoryName)?.emojis || [];
+    const selectCategory = (category: string) => {
+      selectedCategory.value = category;
+      filteredEmojis.value = categories.value[category] || [];
+    };
+
+    const selectEmoji = (emoji: any) => {
+      localSettings.value.chosenEmoji = emoji.emoji; // Set the chosen emoji
+      emit('settingsChanged', localSettings.value); // Notify the tool of the selection
     };
 
     const searchEmojis = () => {
       const query = localSettings.value.query.toLowerCase();
-      if (query) {
-        filteredEmojis.value = emojis.value.filter(emoji =>
-          emoji.annotation.toLowerCase().includes(query)
+
+      if (query && selectedCategory.value) {
+        // Filter emojis by query within the selected category
+        filteredEmojis.value = categories.value[selectedCategory.value].filter((emoji: any) =>
+          emoji.name.toLowerCase().includes(query)
         );
-      } else {
-        filteredEmojis.value = [];
+      } else if (selectedCategory.value) {
+        // Reset filtered emojis to show all in the selected category
+        selectCategory(selectedCategory.value);
       }
     };
 
-    const selectEmoji = (emoji: Emoji) => {
-      localSettings.value.chosenEmoji = getEmojiUrl(emoji.hexcode);
-    };
-
-    const getEmojiUrl = (hexcode: string) => {
-      return `https://cdn.jsdelivr.net/npm/openmoji@13.0.0/color/svg/${hexcode}.svg`;
-    };
-
-    // Hide emoji if image doesn't load
-    const handleImageError = (emoji: Emoji) => {
-      filteredEmojis.value = filteredEmojis.value.filter(e => e !== emoji);
-    };
-
-    watch(() => localSettings, () => {
-      emit('settingsChanged', localSettings.value);
-    }, { deep: true });
+    // Watch for changes to localSettings and ensure categories are loaded
+    watch(
+      () => localSettings.value.emojis,
+      () => {
+        ensureCategoriesLoaded();
+      },
+      { immediate: true, deep: true }
+    );
 
     return {
       localSettings,
-      categories,
-      filteredEmojis,
       selectedCategory,
+      filteredEmojis,
+      categories,
       selectCategory,
       selectEmoji,
-      searchEmojis,
-      handleImageError,
-      getEmojiUrl
+      searchEmojis
     };
-  },
+  }
 });

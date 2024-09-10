@@ -61,11 +61,11 @@ export class TransformTool extends BaseTool {
   override changeSettings(settings: TransformToolSettings) {
     this.m_settings.value = settings;
       
-    function selectAllNonGroupObjects(canvas: fabric.Canvas) {
-      const nonGroupObjects = canvas.getObjects().filter(object => object.type !== 'group');
+    function selectAllObjects(canvas: fabric.Canvas) {
+      const selectableObjects = canvas.getObjects().filter(object => object.hasBorders == true);
   
-      if (nonGroupObjects.length) {
-        const selection = new fabric.ActiveSelection(nonGroupObjects, {
+      if (selectableObjects.length) {
+        const selection = new fabric.ActiveSelection(selectableObjects, {
           canvas: canvas
         });
   
@@ -110,7 +110,7 @@ export class TransformTool extends BaseTool {
     }
     
     if (this.m_settings.value.selectAll && this.m_canvas){
-      selectAllNonGroupObjects(this.m_canvas);
+      selectAllObjects(this.m_canvas);
     }
 
     if (this.m_settings.value.delete) {

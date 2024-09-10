@@ -12,7 +12,7 @@ export default {
   setup() {
     const router = useRouter();
     onMounted(() => {
-      router.push('mainMenu');
+      router.push('signIn');
     });
   }
 };

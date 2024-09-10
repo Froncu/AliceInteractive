@@ -1,0 +1,16 @@
+<div class="sign-in-container">
+  <h2>Sign In</h2>
+  <form @submit.prevent="signInWithEmail">
+    <div>
+      <label for="email">Email:</label>
+      <input type="email" v-model="email" required />
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" v-model="password" required />
+    </div>
+    <button type="submit">Sign In with Email</button>
+  </form>
+  <button @click="signInWithGoogle" class="google-sign-in">Sign In with Google</button>
+  <p v-if="error">{{ error }}</p>
+</div>

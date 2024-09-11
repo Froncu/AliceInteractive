@@ -49,7 +49,8 @@ export default defineComponent({
     });
 
     async function loadData() {
-      const assetsDirectory = 'Test01/PairWiseGame/';
+      const parameters = new URLSearchParams(window.location.search);
+      const assetsDirectory = `${parameters.get('sessionId')}/PairWiseGame/`;
       let fileRef = storageRef(storage, assetsDirectory + 'cards.json');
       const url = await getDownloadURL(fileRef);
 
@@ -59,7 +60,7 @@ export default defineComponent({
         console.error(`Failed to fetch cards: ${response.statusText}`);
         return;
       }
-      
+
       const data = await response.json();
       cards.value = data.cardItems;
       cards.value.forEach(async (card) => {

@@ -36,7 +36,7 @@ export default defineComponent({
     }[] = [];
 
     const choiceTimer = ref<InstanceType<typeof ChoiceTimer>>();
-    const assetsDirectory = 'Test01/DilemmaGame/';
+  
     const isLoading = ref(true);
 
     onMounted(async () => {
@@ -47,6 +47,9 @@ export default defineComponent({
     async function fetchData() {
       try {
         const storage = getStorage();
+        const parameters = new URLSearchParams(window.location.search);
+        const assetsDirectory = `${parameters.get('sessionId')}/DilemmaGame/`;
+
         const fileRef = storageRef(storage, assetsDirectory + 'cardData.json');
         const url = await getDownloadURL(fileRef);
 

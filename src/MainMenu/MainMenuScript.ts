@@ -1,4 +1,4 @@
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import SignIn from '@/components/SignIn/SignIn.vue';
 
@@ -11,7 +11,10 @@ export default defineComponent({
     const router = useRouter();
 
     function loadGame(gameType: string) {
-      router.push({ name: gameType });
+      router.push({ 
+        name: gameType, 
+        query: { sessionId: 'Test01' } 
+      });
     }
 
     return {

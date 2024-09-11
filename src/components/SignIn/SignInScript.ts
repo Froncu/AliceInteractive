@@ -11,7 +11,10 @@ export default defineComponent({
 
     function approveAuthentication() {
       error.value = '';
-      router.push('mainMenu');
+      router.push({ 
+        name: 'mainMenu', 
+        query: { sessionId: 'Test01' } 
+      });
     }
 
     function setError(error: any) {

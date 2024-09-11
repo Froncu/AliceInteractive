@@ -12,7 +12,10 @@ export default {
   setup() {
     const router = useRouter();
     onMounted(() => {
-      router.push('signIn');
+      router.push({ 
+        name: 'signIn', 
+        query: { sessionId: 'Test01' } 
+      });
     });
   }
 };

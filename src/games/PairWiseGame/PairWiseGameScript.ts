@@ -1,4 +1,5 @@
 import { defineComponent, ref, onMounted } from 'vue';
+import LoadingScreen from '@/components/LoadingScreen/LoadingScreen.vue';
 import CardItem from '@/components/CardItem/CardItem.vue';
 import BackGround from '@/components/Background/BackGround.vue';
 import ChoiceTimer from '@/components/ChoiceTimer/ChoiceTimer.vue';
@@ -14,6 +15,7 @@ interface Card {
 export default defineComponent({
   name: 'PairWiseComparison',
   components: {
+    LoadingScreen,
     CardItem,
     BackGround,
     ChoiceTimer
@@ -29,35 +31,42 @@ export default defineComponent({
     const useTimer = ref(true);
 
     const storage = getStorage();
+    const isLoading = ref(true);
 
     onMounted(async () => {
       if (choiceTimer.value) choiceTimer.value.start();
 
       try {
-        const assetsDirectory = 'Test01/PairWiseGame/';
-        let fileRef = storageRef(storage, assetsDirectory + 'cards.json');
-        const url = await getDownloadURL(fileRef);
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          console.error(`Failed to fetch cards: ${response.statusText}`);
-          return;
-        }
-        
-        const data = await response.json();
-        cards.value = data.cardItems;
-        cards.value.forEach(async (card) => {
-          fileRef = storageRef(storage, assetsDirectory + card.imagePath);
-          card.imagePath = await getDownloadURL(fileRef);
-        });
+        await loadData();
+        isLoading.value = false;
 
         sortedCards.value = await quickSort(cards.value);
         finishGame();
+
       } catch (error) {
         console.error('Error fetching file from Firebase Storage:', error);
       }
     });
+
+    async function loadData() {
+      const assetsDirectory = 'Test01/PairWiseGame/';
+      let fileRef = storageRef(storage, assetsDirectory + 'cards.json');
+      const url = await getDownloadURL(fileRef);
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        console.error(`Failed to fetch cards: ${response.statusText}`);
+        return;
+      }
+      
+      const data = await response.json();
+      cards.value = data.cardItems;
+      cards.value.forEach(async (card) => {
+        fileRef = storageRef(storage, assetsDirectory + card.imagePath);
+        card.imagePath = await getDownloadURL(fileRef);
+      });
+    }
 
     function handleTimeUp() {
       if (!choiceTimer.value)
@@ -139,6 +148,7 @@ export default defineComponent({
       gameFinished,
       choiceTimer,
       useTimer,
+      isLoading,
       handleCardSelection,
       downloadJSON, // Expose the download function to the template
       handleTimeUp

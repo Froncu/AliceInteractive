@@ -1,29 +1,26 @@
 <div class="pair-wise-comparison">
-  <div class="background-container">
-    <BackGround />
-  </div>
-  <div class="cards-container" v-if="!gameFinished">
-    <CardItem
-      v-for="card in currentPair"
-      :key="card.id"
-      :card="card"
-      :isSelected="card.id === selectedCardId"
-      @select="handleCardSelection"
-    />
-  </div>
-  <div class="results-container" v-if="gameFinished">
-    <ul class="ranking-list">
-      <h1>Final ranking</h1>
-      <li v-for="(card, index) in sortedCards" :key="card.id">
-        {{ index + 1 }}. {{ card.title }}
-      </li>
-    </ul>
-    <div class="download-button">
-      <button @click="downloadJSON">Download Sorted Cards</button>
+  <LoadingScreen v-if="isLoading" />
+  <div v-else>
+    <div class="background-container">
+      <BackGround />
+    </div>
+    <div class="cards-container" v-if="!gameFinished">
+      <CardItem v-for="card in currentPair" :key="card.id" :card="card" :isSelected="card.id === selectedCardId"
+        @select="handleCardSelection" />
+    </div>
+    <div class="results-container" v-if="gameFinished">
+      <ul class="ranking-list">
+        <h1>Final ranking</h1>
+        <li v-for="(card, index) in sortedCards" :key="card.id">
+          {{ index + 1 }}. {{ card.title }}
+        </li>
+      </ul>
+      <div class="download-button">
+        <button @click="downloadJSON">Download Sorted Cards</button>
+      </div>
+    </div>
+    <div v-if="useTimer">
+      <ChoiceTimer ref="choiceTimer" startSeconds="20" @elapsed="handleTimeUp"></ChoiceTimer>
     </div>
   </div>
-  <div v-if="useTimer">
-    <ChoiceTimer ref="choiceTimer" startSeconds="20" @elapsed="handleTimeUp"></ChoiceTimer>
-  </div>
 </div>
-

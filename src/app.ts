@@ -1,21 +1,16 @@
-import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
+import { router } from './router';
+
+export const sessionId = 'Test01';
 
 export default {
   name: 'App',
-  data() {
-    return {
-      isFullScreen: false,
-      currentGame: null,
-    };
-  },
   setup() {
-    const router = useRouter();
     onMounted(() => {
-      router.push({ 
-        name: 'signIn', 
-        query: { sessionId: 'Test01' } 
+      router.push({
+        name: 'loginPage',
+        query: { sessionId: sessionId }
       });
-    });
+    })
   }
 };

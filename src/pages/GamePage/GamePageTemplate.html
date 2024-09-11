@@ -1,0 +1,6 @@
+<GameProgressBar :total="games.length" :checkedCount="gameIndex" />
+<div class="game-container">
+  <AssociationGame v-if="currentGame == 'AssociationGame'" @gameFinished="onGameFinished" />
+  <PairWiseGame v-if="currentGame == 'PairWiseGame'" @gameFinished="onGameFinished" />
+  <StatementGame v-if="currentGame == 'StatementGame'" @gameFinished="onGameFinished" />
+</div>

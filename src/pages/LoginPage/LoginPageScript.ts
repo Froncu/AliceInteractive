@@ -1,32 +1,36 @@
-import { defineComponent, ref } from 'vue';
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { defineComponent, onMounted, ref } from 'vue';
+import { authentication } from '@/../firebaseConfig.js';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { router } from '@/router';
+import { sessionId } from '@/app';
 
 export default defineComponent({
-  name: 'SignIn',
+  name: 'LoginPage',
   setup() {
     const email = ref('');
     const password = ref('');
     const error = ref('');
 
-    function approveAuthentication() {
-      error.value = '';
-      router.push({ 
-        name: 'mainMenu', 
-        query: { sessionId: 'Test01' } 
-      });
-    }
+    onMounted(() => {
+      onAuthStateChanged(authentication, (user) => {
+        if (!user)
+          return;
+
+        error.value = '';
+        router.push({
+          name: 'mainPage',
+          query: { sessionId: sessionId }
+        });
+      })
+    })
 
     function setError(error: any) {
       error.value = `Error: ${error.message} (Code: ${error.code})`;
     }
 
     function signInWithEmail() {
-      const auth = getAuth();
-
-      signInWithEmailAndPassword(auth, email.value, password.value)
+      signInWithEmailAndPassword(authentication, email.value, password.value)
         .then((userCredential) => {
-          approveAuthentication();
           console.log('User signed in with email:', userCredential.user);
         })
         .catch((error) => {
@@ -36,12 +40,8 @@ export default defineComponent({
     }
 
     function signInWithGoogle() {
-      const auth = getAuth();
-      const provider = new GoogleAuthProvider();
-
-      signInWithPopup(auth, provider)
+      signInWithPopup(authentication, new GoogleAuthProvider())
         .then((result) => {
-          approveAuthentication();
           console.log('User signed in with Google:', result.user);
         })
         .catch((error) => {

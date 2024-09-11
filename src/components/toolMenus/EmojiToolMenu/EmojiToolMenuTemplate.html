@@ -1,47 +1,38 @@
 <div class="emoji-tool-menu">
-    <!-- Search input -->
-    <input
-      type="text"
-      placeholder="Search for emojis"
-      v-model="localSettings.query"
-      @input="searchEmojis"
-    />
+  <!-- Search input -->
+  <input
+    type="text"
+    placeholder="Search for emojis"
+    v-model="localSettings.query"
+  />
+  <button id="search-btn" @click="searchEmojis">Search</button>
 
-    <!-- Display emoji categories -->
-    <div v-if="Object.keys(categories).length" class="emoji-categories">
-      <button
-        v-for="(emojis, category) in categories"
-        :key="category"
-        @click="selectCategory(category)"
-        :class="{ 'selected': selectedCategory === category }"
-      >
-        {{ category }}
-      </button>
-    </div>
+  <!-- Display emoji categories -->
+  <div v-if="Object.keys(categories).length" class="emoji-categories">
+    <button
+      v-for="(emojis, category) in categories"
+      :key="category"
+      @click="selectCategory(category)"
+      :class="{ 'selected': selectedCategory === category }"
+    >
+      {{ category }}
+    </button>
+  </div>
 
-    <!-- Fallback if categories haven't loaded yet -->
-    <div v-else>
-      <p>Loading categories...</p>
-    </div>
+  <!-- Fallback if categories haven't loaded yet -->
+  <div v-else>
+    <p>Loading categories...</p>
+  </div>
 
-    <!-- Display emojis for the selected category -->
-    <div v-if="selectedCategory && filteredEmojis.length" class="emoji-list">
-      <div
-        v-for="emoji in filteredEmojis"
-        :key="emoji.name"
-        class="emoji-item"
-        @click="selectEmoji(emoji)"
-      >
-        {{ emoji.emoji }}
-      </div>
-    </div>
-
-    <!-- Display message if no emojis are found -->
-    <div v-else-if="selectedCategory && !filteredEmojis.length">
-      <p>No emojis found in this category.</p>
-    </div>
-
-    <div v-else>
-      <p>Select a category to view emojis or use the search above.</p>
+  <!-- Display emojis for the search result or selected category -->
+  <div v-if="filteredEmojis.length" class="emoji-list">
+    <div
+      v-for="emoji in filteredEmojis"
+      :key="emoji.name"
+      class="emoji-item"
+      @click="selectEmoji(emoji)"
+    >
+      {{ emoji.emoji }}
     </div>
   </div>
+</div>

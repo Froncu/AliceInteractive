@@ -1,6 +1,6 @@
 import * as fabric from 'fabric';
 import { BaseTool, BaseToolSettings } from '@/components/tools/BaseTool';
-import { ref, defineAsyncComponent, watch } from 'vue';
+import { ref, defineAsyncComponent } from 'vue';
 import { getStorage, ref as storageRef, getDownloadURL, StorageReference } from 'firebase/storage';
 
 export class EmojiToolSettings extends BaseToolSettings {
@@ -18,29 +18,14 @@ export class EmojiTool extends BaseTool {
 
   private m_storage = getStorage();
 
-  override async onChosen(canvas: fabric.Canvas): Promise<void> {
-    try {
-      const assetsDirectory = 'Test01/AssociationGame/';
-      this.m_fileRef = storageRef(this.m_storage, assetsDirectory + 'emojis.json');
-      const url = await getDownloadURL(this.m_fileRef);
+  constructor() {
+    super();
 
-      const response = await fetch(url);
+    if (Object.keys(this.m_settings.emojis).length === 0)
+      this.loadEmojis();
+  }
 
-      if (!response.ok) {
-        console.error(`Failed to fetch emojis: ${response.statusText}`);
-        return;
-      }
-
-      const emojiData = await response.json();
-      this.m_settings.emojis = emojiData.emojis; // Save emoji data into settings
-
-      // Emit the settings change to make sure categories are updated in the menu
-      this.changeSettings(this.m_settings);
-
-    } catch (error) {
-      console.error('Error fetching file from Firebase Storage:', error);
-    }
-
+  override onChosen(canvas: fabric.Canvas) {
     this.m_canvas = canvas;
 
     // Bind placeEmoji method to the class instance
@@ -66,6 +51,22 @@ export class EmojiTool extends BaseTool {
     this.m_settings = settings;
   }
 
+  private async loadEmojis(): Promise<void> {
+    const assetsDirectory = 'Test01/AssociationGame/';
+    this.m_fileRef = storageRef(this.m_storage, assetsDirectory + 'emojis.json');
+    const url = await getDownloadURL(this.m_fileRef);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.error(`Failed to fetch emojis: ${response.statusText}`);
+      return;
+    }
+
+    const emojiData = await response.json();
+    this.m_settings.emojis = emojiData.emojis;
+  }
+
   private placeEmoji(event: fabric.TPointerEventInfo) {
     if (!this.m_settings.chosenEmoji) {
       console.error('No emoji selected.');
@@ -83,12 +84,12 @@ export class EmojiTool extends BaseTool {
 
     const emojiGroup = new fabric.Group(groupArr, {
       selectable: false,
-    });
+    })
 
     emojiGroup.set({
       left: event.viewportPoint.x - emojiGroup.width / 2,
       top: event.viewportPoint.y - emojiGroup.height / 2,
-    });
+    })
 
     this.m_canvas?.add(emojiGroup);
     this.m_canvas?.renderAll();

@@ -6,6 +6,7 @@ export class TransformToolSettings extends BaseToolSettings {
   delete = false;
   selectAll = false;
   group = false;
+  duplicate = false;
 }
 
 export class TransformTool extends BaseTool {
@@ -60,57 +61,58 @@ export class TransformTool extends BaseTool {
 
   override changeSettings(settings: TransformToolSettings) {
     this.m_settings.value = settings;
-      
+
     function selectAllObjects(canvas: fabric.Canvas) {
       const selectableObjects = canvas.getObjects().filter(object => object.hasBorders == true);
-  
+
       if (selectableObjects.length) {
         const selection = new fabric.ActiveSelection(selectableObjects, {
           canvas: canvas
         });
-  
+
         canvas.setActiveObject(selection);
         canvas.renderAll();  // Redraw the canvas
       }
     }
-  
+
     function groupActiveObjects(canvas: fabric.Canvas) {
       const activeObjects = canvas.getActiveObjects();
-      
+
       if (activeObjects.length > 1) {
         const activeSelection = new fabric.ActiveSelection(activeObjects, {
           canvas: canvas
         });
-        
+
         // Calculate the bounding box of the selection
         const { left, top } = activeSelection.getBoundingRect();
-    
+
         // Create a new group with the selected objects
         const group = new fabric.Group(activeObjects, {
-          left: left, 
-          top: top, 
+          left: left,
+          top: top,
           originX: 'left',
           originY: 'top'
         });
-    
+
         // Remove the individual objects from the canvas
         activeObjects.forEach(obj => {
           canvas.remove(obj);
         });
-    
+
         // Add the new group to the canvas
         canvas.add(group);
-    
+
         canvas.discardActiveObject();
 
         canvas.setActiveObject(group);
-    
+
         canvas.renderAll();
       }
     }
-    
-    if (this.m_settings.value.selectAll && this.m_canvas){
+
+    if (this.m_settings.value.selectAll && this.m_canvas) {
       selectAllObjects(this.m_canvas);
+      this.m_settings.value.selectAll = false;
     }
 
     if (this.m_settings.value.delete) {
@@ -119,11 +121,11 @@ export class TransformTool extends BaseTool {
       });
 
       this.m_canvas?.discardActiveObject();
-      this.m_settings.value.delete = false;
       this.m_canvas?.renderAll();
+      this.m_settings.value.delete = false;
     }
 
-    if(this.m_settings.value.group && this.m_canvas){
+    if (this.m_settings.value.group && this.m_canvas) {
       groupActiveObjects(this.m_canvas);
       this.m_settings.value.group = false;
     }

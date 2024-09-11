@@ -13,15 +13,19 @@ export default defineComponent({
     const localSettings = ref({ ...props.settings })
 
     const selectAll = () => {
-        localSettings.value.selectAll = true;
+      localSettings.value.selectAll = true;
     };
 
     const deleteObj = () => {
-        localSettings.value.delete = true;
+      localSettings.value.delete = true;
     };
 
     const groupObj = () => {
-        localSettings.value.group = true;
+      localSettings.value.group = true;
+    }
+
+    const duplicateObj = () => {
+      localSettings.value.duplicate = true;
     }
 
     watch(() => localSettings, () => {
@@ -32,7 +36,8 @@ export default defineComponent({
       localSettings,
       selectAll,
       deleteObj,
-      groupObj
+      groupObj,
+      duplicateObj
     };
   },
 });

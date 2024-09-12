@@ -126,7 +126,7 @@ export default defineComponent({
       }
     });
 
-<<<<<<< HEAD
+
     const firebaseConfig = {
       apiKey: "AIzaSyCLeNx1MRsTzkalAsZhpTWkkOMPwoPO2mw",
       authDomain: "alicedownrabithole.firebaseapp.com",
@@ -171,13 +171,10 @@ export default defineComponent({
       deleteObject
     } */
 
-
-=======
     function onFinish() {
       emit('gameFinished');
     }
 
->>>>>>> fe37840b15206c078b7b0db45d512ae41a5638aa
     return {
       whiteBoard,
       tools,

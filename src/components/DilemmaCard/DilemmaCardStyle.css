@@ -4,9 +4,9 @@
   height: calc(20vw * 4 / 3);
   overflow: hidden;
   cursor: move;
-  background-color: rgba(5, 25, 11, 0.3);
+  background-color: #05190b4d;
   z-index: 3;
-  box-shadow: 0.75vw calc(0.5vw * 4 / 3) 1px 1px rgba(5, 25, 11, 0.3);
+  box-shadow: 0.75vw calc(0.5vw * 4 / 3) 1px 1px #05190b4d;
   translate: -50% -50%;
 }
 

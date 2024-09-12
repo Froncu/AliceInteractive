@@ -1,16 +1,16 @@
 .choice-timer {
   position: absolute;
-  top: 20%;
+  top: 15%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   color: rgba(125, 125, 125, 1.0);
-  font-size: min(25vW, 50vh);
+  font-size: min(20vW, 20vh);
   text-align: center;
   overflow: hidden;
   z-index: 1;
   pointer-events: none;
   font-family: "Century Gothic";
-  color: rgba(5, 25, 11, 0.4);
+  color: #b5b9b6;
 }

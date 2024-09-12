@@ -1,0 +1,6 @@
+<div class="progress-bar">
+  <div v-for="(step, index) in steps" class="step" :class="{ 'active-step': index < currentStep }" />
+  <div class="progress-bar-background">
+    <div class="progress-bar-fill" :style="{ width: progressPercentage + '%' }" />
+  </div>
+</div>

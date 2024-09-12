@@ -1,39 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import SignIn from '@/components/SignIn/SignIn.vue';
-import MainMenu from '@/MainMenu/MainMenu.vue';
-import StatementGame from '@/games/StatementGame/StatementGame.vue';
-import PairWiseGame from '@/games/PairWiseGame/PairWiseGame.vue';
-import AssociationGame from '@/games/AssociationGame/AssociationGame.vue';
+import LoginPage from '@/pages/LoginPage/LoginPage.vue';
+import MainPage from '@/pages/MainPage/MainPage.vue';
+import GamePage from '@/pages/GamePage/GamePage.vue';
 
 const routes = [
-    {
-        path: '/SignIn',
-        name: 'signIn',
-        component: SignIn
-    },
-    {
-        path: '/MainMenu',
-        name: 'mainMenu',
-        component: MainMenu
-    },
-    {
-        path: '/PairWiseGame',
-        name: 'pairWiseGame',
-        component: PairWiseGame
-    },
-    {
-        path: '/StatementGame',
-        name: 'statementGame',
-        component: StatementGame
-    },
-    {
-        path: '/AssociationGame',
-        name: 'associationGame',
-        component: AssociationGame
-    }
+  {
+    path: '/LoginPage',
+    name: 'loginPage',
+    component: LoginPage
+  },
+  {
+    path: '/MainPage',
+    name: 'mainPage',
+    component: MainPage
+  },
+  {
+    path: '/GamePage',
+    name: 'gamePage',
+    component: GamePage
+  }
 ];
 
 export const router = createRouter({
-    history: createWebHistory(),
-    routes
+  history: createWebHistory(),
+  routes
 });

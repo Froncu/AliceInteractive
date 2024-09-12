@@ -1,3 +1,8 @@
+.finish-button{
+    position: absolute;
+    left: 10%;
+  }
+
 .association-game {
     position: absolute;
     display: flex;

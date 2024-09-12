@@ -17,11 +17,14 @@ import * as fabric from 'fabric';
 
 export default defineComponent({
   name: 'AssociationGame',
+  emits: [
+    'gameFinished'
+  ],
   components: {
     WhiteBoard,
     ToolBar
   },
-  setup() {
+  setup(_, { emit }) {
     const whiteBoard = ref<InstanceType<typeof WhiteBoard>>();
     const tools: BaseTool[] = [
       new TransformTool(),
@@ -123,6 +126,7 @@ export default defineComponent({
       }
     });
 
+<<<<<<< HEAD
     const firebaseConfig = {
       apiKey: "AIzaSyCLeNx1MRsTzkalAsZhpTWkkOMPwoPO2mw",
       authDomain: "alicedownrabithole.firebaseapp.com",
@@ -168,9 +172,16 @@ export default defineComponent({
     } */
 
 
+=======
+    function onFinish() {
+      emit('gameFinished');
+    }
+
+>>>>>>> fe37840b15206c078b7b0db45d512ae41a5638aa
     return {
       whiteBoard,
-      tools
+      tools,
+      onFinish
     };
   }
 });

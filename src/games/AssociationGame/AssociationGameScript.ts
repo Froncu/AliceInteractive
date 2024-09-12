@@ -11,9 +11,10 @@ import { TextTool } from '@/components/tools/TextTool';
 import { ImageTool } from '@/components/tools/ImageTool';
 import { InfluenceZone } from '@/components/InfluenceZone';
 import { EmojiTool } from '@/components/tools/EmojiTool';
-import { getDatabase, set, ref as dbRef, push, Query } from "firebase/database";
-import { initializeApp } from 'firebase/app';
+import { set, ref as dbRef, remove } from "firebase/database";
+import { database } from '@/../firebaseConfig.js';
 import * as fabric from 'fabric';
+import { v4 as uuidv4 } from 'uuid';
 
 export default defineComponent({
   name: 'AssociationGame',
@@ -36,6 +37,8 @@ export default defineComponent({
       new BackgroundTool(),
       new EmojiTool()
     ];
+
+    let nextFreeID = 0;
 
     onMounted(() => {
       const zone1 = new InfluenceZone(
@@ -77,99 +80,39 @@ export default defineComponent({
         zone2.placeOnCanvas(canvas, { x: canvas.getWidth() / 1.8, y: canvas.getHeight() * 0.66 });
         zone3.placeOnCanvas(canvas, { x: canvas.getWidth() / 1.2, y: canvas.getHeight() / 4.2 });
 
-        let selection: number[] = [];
-        
-        //const previousStates: Record<number, any> = {};
-
-        canvas.on("object:added", () => writeObjectData(canvas, canvas.getObjects().length - 1, canvas.getObjects()[canvas.getObjects().length - 1]));
-
-        //canvas.on("object:removed", () => deleteObjectData());
-        
-        canvas.on("object:modified", function () {
-          const activeObjects = canvas.getActiveObjects();
-
-          activeObjects.forEach((obj) => {
-            console.log(obj.calcTransformMatrix());
-            const objectId = canvas.getObjects().indexOf(obj);
-            selection.push(objectId);
-            if (objectId !== -1) {
-              writeObjectData(canvas, objectId, obj);
-            }
-          });
+        canvas.on('object:added', (target) => {
+          const object = target.target;
+          object.set({ ID: nextFreeID++ });
+          writeObject(object);
         });
 
-        canvas.on("selection:cleared", function () {
-          selection.forEach((obj) => {
-            writeObjectData(canvas, obj, canvas.getObjects()[obj]);
-          })
-          selection = [];
+        canvas.on('object:modified', (target) => {
+          const object = target.target;
+          writeObject(object);
         });
 
-
-        /* canvas.on("object:added", function(object){
-          const targetObj = object.target;
-          const objectId = canvas.getObjects().indexOf(targetObj);
-          console.log(objectId);
+        canvas.on('object:removed', (target) => {
+          const object = target.target;
+          deleteObject(object);
         });
-
-        canvas.on("object:removed", function(object){
-          const targetObj = object.target;
-          const objectId = canvas.getObjects().indexOf(targetObj);
-          console.log(objectId);
-        });
-
-        canvas.on("object:modified", function(object){
-          const targetObj = object.target;
-          const objectId = canvas.getObjects().indexOf(targetObj);
-          console.log(objectId);
-        }); */
       }
     });
 
+    function writeObject(object: fabric.FabricObject) {
+      const ID = object.get('ID') as number;
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCLeNx1MRsTzkalAsZhpTWkkOMPwoPO2mw",
-      authDomain: "alicedownrabithole.firebaseapp.com",
-      databaseURL: "https://alicedownrabithole-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "alicedownrabithole",
-      storageBucket: "alicedownrabithole.appspot.com",
-      messagingSenderId: "161855541756",
-      appId: "1:161855541756:web:7f4c1cc68d6f15b0ab2279",
-      measurementId: "G-VSJY5XVPKM"
-
-    };
-
-    const app = initializeApp(firebaseConfig);
-
-    function writeObjectData(canvas: fabric.Canvas, objectId: number, object: fabric.FabricObject) {
-      const db = getDatabase();
-      const reference = dbRef(db, "canvasObjects/");
-      const newRef = push(reference);
-
-      const objectData = object.toObject();
-
-      const sanitizedObject = JSON.parse(JSON.stringify(objectData));
-
-      set(newRef, {
-        Id: objectId,
-        object: sanitizedObject, // Send the sanitized object
+      set(dbRef(database, `canvasObjects/${ID}`), {
+        ID: ID,
+        object: JSON.parse(JSON.stringify(object))
       }).catch((error) => {
         console.error("Error saving object to Firebase:", error);
       });
     }
 
-    /* function updateObjectData(canvas: fabric.Canvas, objectId: number, object: fabric.FabricObject) {
-
-    } */
-    
-    /* function deleteObjectData(canvas: fabric.Canvas, objectId: number, object: fabric.FabricObject) {
-      const db = getDatabase();
-      const reference = dbRef(db, "canvasObjects/");
-      const newRef = push(reference);
-      
-      Query applesQuery = ref.child("firebase-test").orderByChild("title").equalTo("Apple");
-      deleteObject
-    } */
+    function deleteObject(object: fabric.FabricObject) {
+      const ID = object.get('ID') as number;
+      remove(dbRef(database, `canvasObjects/${ID}`));
+    }
 
     function onFinish() {
       emit('gameFinished');

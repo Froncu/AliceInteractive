@@ -14,13 +14,16 @@ interface Card {
 
 export default defineComponent({
   name: 'PairWiseComparison',
+  emits: [
+    'gameFinished'
+  ],
   components: {
     LoadingScreen,
     CardItem,
     BackGround,
     ChoiceTimer
   },
-  setup() {
+  setup(_, { emit }) {
     const cards = ref<Card[]>([]);
     const sortedCards = ref<Card[]>([]);
     const currentPair = ref<Card[]>([]);
@@ -127,6 +130,7 @@ export default defineComponent({
     function finishGame() {
       gameFinished.value = true; // Set the game as finished, showing the download button and results
       useTimer.value = false;
+      emit('gameFinished');
     }
 
     function downloadJSON() {

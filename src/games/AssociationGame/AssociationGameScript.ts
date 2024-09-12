@@ -17,11 +17,14 @@ import * as fabric from 'fabric';
 
 export default defineComponent({
   name: 'AssociationGame',
+  emits: [
+    'gameFinished'
+  ],
   components: {
     WhiteBoard,
     ToolBar
   },
-  setup() {
+  setup(_, { emit }) {
     const whiteBoard = ref<InstanceType<typeof WhiteBoard>>();
     const tools: BaseTool[] = [
       new TransformTool(),
@@ -123,6 +126,7 @@ export default defineComponent({
       }
     });
 
+
     const firebaseConfig = {
       apiKey: "AIzaSyCLeNx1MRsTzkalAsZhpTWkkOMPwoPO2mw",
       authDomain: "alicedownrabithole.firebaseapp.com",
@@ -152,7 +156,7 @@ export default defineComponent({
       }).catch((error) => {
         console.error("Error saving object to Firebase:", error);
       });
-    }
+    };
 
     /* function updateObjectData(canvas: fabric.Canvas, objectId: number, object: fabric.FabricObject) {
 
@@ -167,10 +171,14 @@ export default defineComponent({
       deleteObject
     } */
 
+    function onFinish() {
+      emit('gameFinished');
+    }
 
     return {
       whiteBoard,
-      tools
+      tools,
+      onFinish
     };
   }
 });

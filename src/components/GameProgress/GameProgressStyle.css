@@ -1,0 +1,36 @@
+.progress-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.step {
+  position: relative;
+  background-color: #b5b9b6;
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  transition: background-color 1s ease-in-out;
+}
+
+.step.active-step {
+  background-color: #3498db;
+}
+
+.progress-bar-background {
+  position: absolute;
+  height: 8px;
+  width: 100%;
+  background-color: #b5b9b6;
+  z-index: -1;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #3498db;
+  border-radius: 2.5px;
+  transition: width 1s ease-in-out;
+  overflow: hidden;
+}

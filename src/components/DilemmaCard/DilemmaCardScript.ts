@@ -38,7 +38,7 @@ export default defineComponent({
             return;
           
           cardElement.value.style.left = '50%';
-          cardElement.value.style.top = '70%';
+          cardElement.value.style.top = '60%';
           cardElement.value.style.rotate = '';
         }
 
@@ -136,7 +136,7 @@ export default defineComponent({
       }
       else {
         cardElement.value.style.left = '50%';
-        cardElement.value.style.top = '70%';
+        cardElement.value.style.top = '60%';
         cardElement.value.style.rotate = '';
       }
 
@@ -148,7 +148,7 @@ export default defineComponent({
       cardElement.value = document.querySelector<HTMLElement>('.dilemma-card');
       if (cardElement.value) {
         cardElement.value.style.left = '50%';
-        cardElement.value.style.top = '70%';
+        cardElement.value.style.top = '60%';
         cardElement.value.style.rotate = '';
       }
       window.addEventListener('mouseup', release);

@@ -1,24 +1,26 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import { storage } from '@/../firebaseConfig';
 import { ref as storageRef, getDownloadURL } from 'firebase/storage';
-import GameProgressBar from '@/components/GameProgressBar/GameProgressBar.vue';
+import GameProgress from '@/components/GameProgress/GameProgress.vue';
 import AssociationGame from '@/games/AssociationGame/AssociationGame.vue';
 import PairWiseGame from '@/games/PairWiseGame/PairWiseGame.vue';
 import StatementGame from '@/games/StatementGame/StatementGame.vue';
+import { router } from '@/router';
 
 export default defineComponent({
   name: 'GamePage',
   components: {
-    GameProgressBar,
+    GameProgress,
     AssociationGame,
     PairWiseGame,
     StatementGame
   },
   setup() {
+    const gameProgress = ref<InstanceType<typeof GameProgress>>();
     const games = ref(new Array<string>);
     const gameIndex = ref(-1);
+    const gamesCount = ref(0);
     const currentGame = ref<string>('');
-    const gameFinished = ref(false);
 
     onMounted(async () => {
       const parameters = new URLSearchParams(window.location.search);
@@ -27,24 +29,24 @@ export default defineComponent({
       const response = await fetch(url);
       const data = await response.json();
       games.value = Object.values(data);
+      gamesCount.value = games.value.length;
 
       nextGame();
     });
 
-    function onGameFinished() {
-      gameFinished.value = true;
-    }
-
     function nextGame() {
-      currentGame.value = games.value[++gameIndex.value];
-      gameFinished.value = false;
+      if (gameIndex.value == games.value.length - 1)
+        router.push('mainPage');
+      else {
+        currentGame.value = games.value[++gameIndex.value];
+        gameProgress.value?.nextStep();
+      }
     }
 
     return {
-      games,
-      gameIndex,
+      gameProgress,
+      gamesCount,
       currentGame,
-      onGameFinished,
       nextGame
     };
   }

@@ -1,6 +1,6 @@
 .choice-timer {
   position: absolute;
-  top: 20%;
+  top: 15%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
@@ -12,5 +12,5 @@
   z-index: 1;
   pointer-events: none;
   font-family: "Century Gothic";
-  color: rgba(5, 25, 11, 0.4);
+  color: #b5b9b6;
 }

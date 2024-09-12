@@ -14,11 +14,14 @@ import { EmojiTool } from '@/components/tools/EmojiTool';
 
 export default defineComponent({
   name: 'AssociationGame',
+  emits: [
+    'gameFinished'
+  ],
   components: {
     WhiteBoard,
     ToolBar
   },
-  setup() {
+  setup(_, { emit }) {
     const whiteBoard = ref<InstanceType<typeof WhiteBoard>>();
     const tools: BaseTool[] = [
       new TransformTool(),
@@ -73,9 +76,14 @@ export default defineComponent({
       }
     });
 
+    function onFinish() {
+      emit('gameFinished');
+    }
+
     return {
       whiteBoard,
-      tools
+      tools,
+      onFinish
     };
   }
 });

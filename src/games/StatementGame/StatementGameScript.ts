@@ -1,9 +1,11 @@
 import { defineComponent, ref, onMounted } from 'vue';
-import { getStorage, getDownloadURL, ref as storageRef } from 'firebase/storage';
+import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage';
 import LoadingScreen from '@/components/LoadingScreen/LoadingScreen.vue';
 import DilemmaCard from '@/components/DilemmaCard/DilemmaCard.vue';
 import PlaceHolder from '@/components/PlaceHolder/PlaceHolder.vue';
 import ChoiceTimer from '@/components/ChoiceTimer/ChoiceTimer.vue';
+import { authentication, storage } from '@/../firebaseConfig.js';
+import { sessionId } from '@/app';
 
 class Round {
   centerImage = '';
@@ -16,16 +18,20 @@ class Round {
 
 export default defineComponent({
   name: 'StatementGame',
+  emits: [
+    'gameFinished'
+  ],
   components: {
     LoadingScreen,
     DilemmaCard,
     PlaceHolder,
     ChoiceTimer
   },
-  setup() {
+  setup(_, { emit }) {
     let rounds = new Array<Round>;
     let roundIndex = -1;
     const round = ref(new Round);
+    let uploaded = false;
 
     const answers: {
       givenImage: string;
@@ -36,7 +42,7 @@ export default defineComponent({
     }[] = [];
 
     const choiceTimer = ref<InstanceType<typeof ChoiceTimer>>();
-  
+
     const isLoading = ref(true);
 
     onMounted(async () => {
@@ -46,7 +52,6 @@ export default defineComponent({
 
     async function fetchData() {
       try {
-        const storage = getStorage();
         const parameters = new URLSearchParams(window.location.search);
         const assetsDirectory = `${parameters.get('sessionId')}/DilemmaGame/`;
 
@@ -70,7 +75,7 @@ export default defineComponent({
 
         incrementRound();
         isLoading.value = false;
-        
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -78,22 +83,17 @@ export default defineComponent({
 
     function incrementRound() {
       choiceTimer.value?.reset(true);
-      round.value = rounds[++roundIndex];
+      if (roundIndex === rounds.length - 1) {
+        uploadResult();
+        emit('gameFinished');
+      }
+      else
+        round.value = rounds[++roundIndex];
     }
 
     function onChoiceMade(placeholder: { image: string, text: string }) {
       if (!choiceTimer.value)
         return;
-
-      if (roundIndex >= rounds.length - 1) {
-        if (roundIndex === rounds.length - 1) {
-          saveAnswersToFile();
-          ++roundIndex;
-          choiceTimer.value.reset(false);
-        }
-
-        return;
-      }
 
       answers.push({
         givenImage: round.value.centerImage,
@@ -106,15 +106,20 @@ export default defineComponent({
       incrementRound();
     }
 
-    function saveAnswersToFile() {
+    async function uploadResult() {
+      if (uploaded)
+        return;
+
       const fileData = JSON.stringify(answers, null, 2);
       const blob = new Blob([fileData], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'answers.json';
-      a.click();
-      URL.revokeObjectURL(url);
+      const location = storageRef(storage, sessionId + `/DilemmaGame/Results/${authentication.currentUser?.uid}.json`);
+
+      try {
+        await uploadBytes(location, blob);
+        uploaded = true;
+      } catch (error) {
+        console.error('Upload failed:', error);
+      }
     }
 
     function onTimeUp() {

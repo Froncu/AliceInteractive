@@ -79,8 +79,6 @@ export default defineComponent({
         zone2.placeOnCanvas(canvas, { x: canvas.getWidth() / 1.8, y: canvas.getHeight() * 0.66 });
         zone3.placeOnCanvas(canvas, { x: canvas.getWidth() / 1.2, y: canvas.getHeight() / 4.2 });
 
-        //let selection: number[] = [];
-
         canvas.on('object:added', (target) => {
           const object = target.target;
           object.set({ ID: nextFreeID++ });

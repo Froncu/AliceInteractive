@@ -30,7 +30,7 @@
   }
   
   .search-results {
-    height: 60vh;
+    height: 45vh;
     width: 100%;
     overflow-y: scroll;
     display: flex;

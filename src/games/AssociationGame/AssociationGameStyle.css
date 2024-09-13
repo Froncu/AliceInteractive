@@ -25,3 +25,9 @@
     width: 20%;
     max-height: 90%;
 }
+
+.finish-button {
+    position: absolute;
+    left: 95%;
+    top: 95%;
+}

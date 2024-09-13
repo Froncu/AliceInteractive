@@ -14,6 +14,7 @@ import { EmojiTool } from '@/components/tools/EmojiTool';
 import { set, ref as dbRef, remove } from "firebase/database";
 import { database } from '@/../firebaseConfig.js';
 import * as fabric from 'fabric';
+import { v4 as uuid } from 'uuid';
 
 export default defineComponent({
   name: 'AssociationGame',
@@ -36,8 +37,6 @@ export default defineComponent({
       new BackgroundTool(),
       new EmojiTool()
     ];
-
-    let nextFreeID = 0;
 
     onMounted(() => {
       const zone1 = new InfluenceZone(
@@ -81,7 +80,7 @@ export default defineComponent({
 
         canvas.on('object:added', (target) => {
           const object = target.target;
-          object.set({ ID: nextFreeID++ });
+          object.set({ ID: uuid() });
           writeObject(object);
         });
 

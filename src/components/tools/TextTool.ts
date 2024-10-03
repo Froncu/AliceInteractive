@@ -10,7 +10,7 @@ export class TextToolSettings extends BaseToolSettings {
 }
 
 export class TextTool extends BaseTool {
-  name = 'Text tool';
+  name = 'Tekst';
 
   private m_canvas?: fabric.Canvas;
   private m_settings = ref(new TextToolSettings);

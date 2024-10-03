@@ -8,7 +8,7 @@ export class ImageToolSettings implements BaseToolSettings {
 }
 
 export class ImageTool extends BaseTool {
-  name = 'Image tool';
+  name = 'Afbeeldingen';
 
   private m_settings = new ImageToolSettings();
   private m_canvas?: fabric.Canvas;

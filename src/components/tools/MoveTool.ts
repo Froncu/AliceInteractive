@@ -2,7 +2,7 @@ import * as fabric from "fabric";
 import { BaseTool } from "./BaseTool";
 
 export class MoveTool extends BaseTool {
-  name = 'Move tool';
+  name = 'Verplaats';
 
   private m_canvas?: fabric.Canvas;
   private grabPosition = { x: 0, y: 0 };

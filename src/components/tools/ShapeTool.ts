@@ -11,7 +11,7 @@
   }
 
   export class ShapeTool extends BaseTool {
-    name = 'Shape tool';
+    name = 'Figuren';
 
     private m_canvas?: fabric.Canvas;
     private m_settings = ref(new ShapeToolSettings());

@@ -10,7 +10,7 @@ export class EmojiToolSettings extends BaseToolSettings {
 }
 
 export class EmojiTool extends BaseTool {
-  name = 'Emoji tool';
+  name = 'Emoji';
 
   private m_fileRef?: StorageReference;
   private m_settings = new EmojiToolSettings();

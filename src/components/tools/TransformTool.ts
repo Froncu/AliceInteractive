@@ -10,7 +10,7 @@ export class TransformToolSettings extends BaseToolSettings {
 }
 
 export class TransformTool extends BaseTool {
-  name = 'Transform tool';
+  name = 'Vervorm';
 
   private m_settings = ref(new TransformToolSettings);
   private m_canvas?: fabric.Canvas;

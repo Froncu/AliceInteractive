@@ -17,6 +17,20 @@ export default defineComponent({
 
     const emojiData = localSettings.value.emojis;
 
+    // Translation object for category names
+    const categoryTranslations: Record<string, string> = {
+      'Smileys & Emotion': 'Emoties',
+      'People & Body': 'Personen & Lichaam',
+      'Component': 'Componenten',
+      'Animals & Nature': 'Dieren & Planten',
+      'Food & Drink': 'Eten & Drinken',
+      'Travel & Places': 'Reizen',
+      'Activities': 'Activiteiten',
+      'Objects': 'Objecten',
+      'Symbols': 'Symbolen',
+      'Flags': 'Vlaggen',
+    };
+
     // Ensure categories are loaded and emojis are categorized
     const ensureCategoriesLoaded = () => {
       categorizeEmojis();
@@ -37,6 +51,11 @@ export default defineComponent({
         }
         categories.value[category] = emojiArray; // Store categorized emojis
       }
+    };
+
+    // Helper to get translated category name
+    const getCategoryName = (category: string) => {
+      return categoryTranslations[category] || category;
     };
 
     const selectCategory = (category: string) => {
@@ -94,7 +113,8 @@ export default defineComponent({
       categories,
       selectCategory,
       selectEmoji,
-      searchEmojis
+      searchEmojis,
+      getCategoryName,  // Expose the category translation helper
     };
   }
 });

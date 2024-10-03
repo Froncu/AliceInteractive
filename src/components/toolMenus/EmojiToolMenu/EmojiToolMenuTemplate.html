@@ -2,10 +2,10 @@
   <!-- Search input -->
   <input
     type="text"
-    placeholder="Search for emojis"
+    placeholder="Zoek emojis"
     v-model="localSettings.query"
   />
-  <button id="search-btn" @click="searchEmojis">Search</button>
+  <button id="search-btn" @click="searchEmojis">Zoek</button>
 
   <!-- Display emoji categories -->
   <div v-if="Object.keys(categories).length" class="emoji-categories">
@@ -15,8 +15,8 @@
       @click="selectCategory(category)"
       :class="{ 'selected': selectedCategory === category }"
     >
-      {{ category }}
-    </button>
+    {{ getCategoryName(category) }}
+  </button>
   </div>
 
   <!-- Fallback if categories haven't loaded yet -->

@@ -1,17 +1,17 @@
 <div class="shape-tool-menu">
   <select id="shapes" name="Shapes" v-model="localSettings.shape">
-    <option value="rect">Rectangle</option>
-    <option value="ellipse">Circle</option>
-    <option value="triangle">Triangle</option>
+    <option value="rect">Rechthoek</option>
+    <option value="ellipse">Cirkel</option>
+    <option value="triangle">Driehoek</option>
   </select>
   <div></div>
-  <input type="color" id="fillColor" v-model="localSettings.fillColor">Fill Color</input>
+  <input type="color" id="fillColor" v-model="localSettings.fillColor">Opvullings kleur</input>
   <div></div>
-  <input type="range" min="0" max="16" id="strokeWidth" @input="onStrokeWidthChange" v-model="localSettings.strokeWidth">Stroke Width</input>
+  <input type="range" min="0" max="16" id="strokeWidth" @input="onStrokeWidthChange" v-model="localSettings.strokeWidth">Lijnbreedte</input>
   <div></div>
-  <input type="color" id="strokeColor" v-model="localSettings.strokeColor">Stroke Color</input>
+  <input type="color" id="strokeColor" v-model="localSettings.strokeColor">Lijnkleur</input>
   <div></div>
-  <input type="checkbox" id="centered" v-model="localSettings.centered">Centered</input>
+  <input type="checkbox" id="centered" v-model="localSettings.centered">Centreren</input>
   <div></div>
   <canvas id="shapePreview" width="64" height="64" />
   <div></div>

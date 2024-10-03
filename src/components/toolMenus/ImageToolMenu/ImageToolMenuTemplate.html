@@ -1,6 +1,6 @@
 <div class="image-tool-menu">
   <input type="text" id="query" placeholder="Zoek een afbeelding" v-model="searchQuery" />
-  <button id="search-btn" @click="onSearch">Search</button>
+  <button id="search-btn" @click="onSearch">Zoek</button>
   
   <div v-if="photos.length" class="search-results">
     <div 
@@ -14,7 +14,7 @@
   </div>
   
   <div class="pagination-buttons">
-    <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
-    <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    <button @click="prevPage" :disabled="currentPage === 1">Vorige</button>
+    <button @click="nextPage" :disabled="currentPage === totalPages">Volgende</button>
   </div>
 </div>

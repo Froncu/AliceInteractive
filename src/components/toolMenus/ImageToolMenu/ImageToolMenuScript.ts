@@ -25,7 +25,7 @@ export default defineComponent({
       emit('settingsChanged', localSettings.value);
 
       // Call the Pexels API with pagination support
-      client.photos.search({ query: searchQuery.value, per_page: 12, page: currentPage.value }).then(response => {
+      client.photos.search({ query: searchQuery.value, per_page: 12, page: currentPage.value, locale: 'nl-NL' }).then(response => {
         if ('photos' in response) {
           photos.value = response.photos;
           totalPages.value = Math.ceil(response.total_results / 12);  // Calculate total pages

@@ -3,7 +3,10 @@ import LoadingScreen from '@/components/LoadingScreen/LoadingScreen.vue';
 import CardItem from '@/components/CardItem/CardItem.vue';
 import BackGround from '@/components/Background/BackGround.vue';
 import ChoiceTimer from '@/components/ChoiceTimer/ChoiceTimer.vue';
-import { getStorage, ref as storageRef, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref as storageRef, getDownloadURL, uploadBytes } from 'firebase/storage';
+import { authentication } from '@/../firebaseConfig.js'; // Import authentication
+import { sessionId } from '@/app';  // Assuming sessionId is accessible
+
 
 interface Card {
   id: number;
@@ -32,6 +35,8 @@ export default defineComponent({
     const gameFinished = ref<boolean>(false);
     const choiceTimer = ref<InstanceType<typeof ChoiceTimer> | null>();
     const useTimer = ref(true);
+    let uploaded = false; // To prevent multiple uploads
+
 
     const storage = getStorage();
     const isLoading = ref(true);
@@ -130,10 +135,27 @@ export default defineComponent({
     function finishGame() {
       gameFinished.value = true; // Set the game as finished, showing the download button and results
       useTimer.value = false;
+      uploadResult();  // Call uploadResult when the game finishes
       emit('gameFinished');
     }
 
-    function downloadJSON() {
+    async function uploadResult() {
+      if (uploaded) return;  // Prevent multiple uploads
+
+      const fileData = JSON.stringify(sortedCards.value, null, 2);
+      const blob = new Blob([fileData], { type: 'application/json' });
+      const location = storageRef(storage, `${sessionId}/PairWiseGame/Results/${authentication.currentUser?.uid}.json`);
+
+      try {
+        await uploadBytes(location, blob); // Upload the sorted cards as a JSON file to Firebase
+        uploaded = true;
+        console.log('Results uploaded successfully');
+      } catch (error) {
+        console.error('Upload failed:', error);
+      }
+    }
+
+    /*function downloadJSON() {
       const dataStr = JSON.stringify(sortedCards.value, null, 2);
       const blob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -143,7 +165,7 @@ export default defineComponent({
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    }
+    }*/
 
     return {
       cards,
@@ -155,7 +177,7 @@ export default defineComponent({
       useTimer,
       isLoading,
       handleCardSelection,
-      downloadJSON, // Expose the download function to the template
+      //downloadJSON, // Expose the download function to the template
       handleTimeUp
     };
   },

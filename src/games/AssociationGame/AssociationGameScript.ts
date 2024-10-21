@@ -15,12 +15,23 @@ import { set, ref as dbRef, remove, onValue } from "firebase/database";
 import { database } from '@/../firebaseConfig.js';
 import * as fabric from 'fabric';
 import { v4 as uuid } from 'uuid';
+import { loadFromFirebase } from '@/Utils/LoadFromFirebase';
+
+
+interface InfluenceZoneData {
+  size: number;
+  name: string;
+  color: string;
+  bordercolor: string;
+  bordersize: number;
+  fontsize: number;
+  fontcolor: string;
+  image: string;
+}
 
 export default defineComponent({
   name: 'AssociationGame',
-  emits: [
-    'gameFinished'
-  ],
+  emits: ['gameFinished'],
   components: {
     WhiteBoard,
     ToolBar
@@ -38,101 +49,84 @@ export default defineComponent({
       new EmojiTool()
     ];
 
-    onMounted(() => {
-      const zone1 = new InfluenceZone(
-        200, // zoneSize
-        '', // zoneName
-        '#ffffff', // zoneColor
-        'black', // borderColor
-        1, // borderSize
-        16, // fontSize
-        'black', // textColor
-        'https://png.pngtree.com/png-vector/20220607/ourmid/pngtree-cartoon-germ-virus-infection-disease-png-image_4920053.png' // zoneImage
-      );
-
-      const zone2 = new InfluenceZone(
-        256, // zoneSize
-        'Schimmel', // zoneName
-        '#ffffff', // zoneColor
-        'black', // borderColor
-        1, // borderSize
-        16, // fontSize
-        'black', // textColor
-        'https://png.pngtree.com/png-vector/20220501/ourmid/pngtree-mold-icon-isolated-on-white-background-mildew-food-splash-vector-png-image_30206614.png' // zoneImage
-      );
-
-      const zone3 = new InfluenceZone(
-        128, // zoneSize
-        'Dit is een voorbeeld text', // zoneName
-        '#ffffff', // zoneColor
-        'black', // borderColor
-        1, // borderSize
-        16, // fontSize
-        'black', // textColor
-        '' // zoneImage
-      );
-
-      if (whiteBoard.value) {
-
-        const canvas = whiteBoard.value.canvas();
-        const isUpdatingFromFirebase = false;
-
-        zone1.placeOnCanvas(canvas, { x: canvas.getWidth() / 5, y: canvas.getHeight() / 3 });
-        zone2.placeOnCanvas(canvas, { x: canvas.getWidth() / 1.8, y: canvas.getHeight() * 0.66 });
-        zone3.placeOnCanvas(canvas, { x: canvas.getWidth() / 1.2, y: canvas.getHeight() / 4.2 });
-
-        canvas.on('object:added', (target) => {
-          if (!isUpdatingFromFirebase) {
-            const object = target.target;
-            object.set({ ID: uuid() });
-            writeObject(object);
-          }
-        });
-
-        canvas.on('object:modified', (target) => {
-          if (!isUpdatingFromFirebase) {
-            const object = target.target;
-            writeObject(object);
-          }
-        });
-
-        canvas.on('object:removed', (target) => {
-          if (!isUpdatingFromFirebase) {
-            const object = target.target;
-            deleteObject(object);
-          }
-        });
-
-        const updateRef = dbRef(database, 'canvasObjects/update/');
-
-        /* onValue(updateRef, (snapshot) => {
-          isUpdatingFromFirebase = true; // Prevent canvas event triggering
-
-          snapshot.forEach(childSnapshot => {
-            const objectData:fabric.FabricObject = childSnapshot.val().object;
-
-            // fabric.util.enlivenObjects requires an array of object definitions
-            fabric.util.enlivenObjects((objectData:fabric.FabricObject) => {
-              const obj = objects[0]; // Get the first (and only) object
-              if (obj) {
-                canvas.add(obj); // Add the object to the canvas
-                obj.set({ ID: uuid() }); // Ensure the object has an ID
-                canvas.renderAll(); // Render the canvas after adding the object
-              }
-            }); // Add a null options argument to match EnlivenObjectOptions
+    // Define an async function inside the onMounted hook
+    onMounted(async () => {
+      try {
+        // Fetch InfluenceZone data from Firebase (ensure it matches the type)
+        const InfluenceZoneData: InfluenceZoneData[] = await loadFromFirebase('AssociationGame', 'influenceZones');
+    
+        if (whiteBoard.value) {
+          const canvas = whiteBoard.value.canvas();
+          const isUpdatingFromFirebase = false;
+    
+          // Correctly type the totalZoneSize
+          const totalZoneSize = InfluenceZoneData.reduce((total: number, zone: InfluenceZoneData) => total + zone.size, 0);
+    
+          // Get canvas dimensions
+          const canvasWidth = canvas.getWidth();
+          const canvasHeight = canvas.getHeight();
+          const canvasArea = canvasWidth * canvasHeight;
+    
+          InfluenceZoneData.forEach((zoneData, index) => {
+            // Scale the size based on the canvas size
+            const zoneSizeRatio = zoneData.size / totalZoneSize;
+            const zoneArea = canvasArea * zoneSizeRatio;
+            const zoneSideLength = Math.sqrt(zoneArea); // Assume square zones
+    
+            // Create InfluenceZone object
+            const zone = new InfluenceZone(
+              zoneSideLength/3, // scaled zone size
+              zoneData.name,
+              zoneData.color,
+              zoneData.bordercolor,
+              zoneData.bordersize,
+              zoneData.fontsize,
+              zoneData.fontcolor,
+              zoneData.image
+            );
+    
+            // Calculate positions based on grid or other layout logic
+            console.log(zoneSideLength )
+            const x = zoneSideLength*index + (zoneSideLength/3) // Example grid logic: 3 zones per row
+            const y = Math.floor(index / 3) * (canvasHeight / 3);  // Move to the next row after 3 zones
+            // Place the zone on canvas
+            console.log(x, y)
+            zone.placeOnCanvas(canvas, { x, y });
           });
-
-          isUpdatingFromFirebase = false; // Re-enable event handling
-        }); */
-
-
+    
+          // Canvas events
+          canvas.on('object:added', (target) => {
+            if (!isUpdatingFromFirebase) {
+              const object = target.target;
+              object.set({ ID: uuid() });
+              writeObject(object);
+            }
+          });
+    
+          canvas.on('object:modified', (target) => {
+            if (!isUpdatingFromFirebase) {
+              const object = target.target;
+              writeObject(object);
+            }
+          });
+    
+          canvas.on('object:removed', (target) => {
+            if (!isUpdatingFromFirebase) {
+              const object = target.target;
+              deleteObject(object);
+            }
+          });
+    
+          const updateRef = dbRef(database, 'canvasObjects/update/');
+        }
+      } catch (error) {
+        console.error("Error loading InfluenceZone data:", error);
       }
     });
 
     function writeObject(object: fabric.FabricObject) {
       const ID = object.get('ID') as string;
 
-      // Only update the object if it's been modified.
       set(dbRef(database, `canvasObjects/update/${ID}`), {
         object: JSON.parse(JSON.stringify(object))
       }).catch((error) => {

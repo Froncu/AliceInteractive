@@ -1,0 +1,33 @@
+[
+    {
+      "size": 30,
+      "name": "",
+      "color": "#ffffff",
+      "bordercolor": "black",
+      "bordersize": 4,
+      "fontsize": 16,
+      "fontcolor": "black",
+      "image": "https://png.pngtree.com/png-vector/20220607/ourmid/pngtree-cartoon-germ-virus-infection-disease-png-image_4920053.png"
+    },
+    {
+      "size": 30,
+      "name": "Schimmel",
+      "color": "#ffffff",
+      "bordercolor": "black",
+      "bordersize": 1,
+      "fontsize": 16,
+      "fontcolor": "black",
+      "image": "https://png.pngtree.com/png-vector/20220501/ourmid/pngtree-mold-icon-isolated-on-white-background-mildew-food-splash-vector-png-image_30206614.png"
+    },
+    {
+      "size": 30,
+      "name": "Schimmel",
+      "color": "#ffffff",
+      "bordercolor": "black",
+      "bordersize": 3,
+      "fontsize": 16,
+      "fontcolor": "black",
+      "image": ""
+    }
+  ]
+  

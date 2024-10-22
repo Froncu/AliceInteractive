@@ -43,19 +43,52 @@ export default defineComponent({
 
     onMounted(async () => {
       if (choiceTimer.value) choiceTimer.value.start();
-
+      
       try {
-        await loadData();
-        isLoading.value = false;
-
-        sortedCards.value = await quickSort(cards.value);
-        finishGame();
-
+        const userUID = authentication.currentUser?.uid;
+        const sessionIdValue = sessionId;
+    
+        if (!userUID || !sessionIdValue) {
+          throw new Error("User not authenticated or sessionId is missing.");
+        }
+    
+        // Check if result already exists
+        const resultExists = await checkIfResultExists(userUID, sessionIdValue);
+    
+        if (resultExists) {
+          console.log("Result exists for user, skipping the game.");
+          finishedGameBefore();  // Automatically finish the game without uploading
+        } else {
+          console.log("Result does not exist, proceeding with the game.");
+          await loadData();  // Load the game data
+          isLoading.value = false;
+          sortedCards.value = await quickSort(cards.value);  // Sort the cards
+          finishGame();  // Finish the game and upload the results
+        }
       } catch (error) {
         console.error('Error fetching file from Firebase Storage:', error);
       }
     });
-
+    
+    // Enhanced function to check if result JSON exists in Firebase Storage
+    async function checkIfResultExists(userUID: string, sessionId: string): Promise<boolean> {
+      const location = storageRef(storage, `${sessionId}/PairWiseGame/Results/${userUID}.json`);
+    
+      try {
+        await getDownloadURL(location);  // Attempt to fetch the file URL
+        console.log(`File found at: ${location.fullPath}`);  // Log URL if file exists
+        return true;  // File exists
+      } catch (error: any) {
+        if (error.code === 'storage/object-not-found') {
+          console.log("File not found in Firebase Storage.");
+          return false;  // File doesn't exist
+        } else {
+          console.error("Error checking for result file:", error);
+          throw error;  // Other errors should be handled
+        }
+      }
+    }
+    
     async function loadData() {
       const parameters = new URLSearchParams(window.location.search);
       const assetsDirectory = `${parameters.get('sessionId')}/PairWiseGame/`;
@@ -131,6 +164,14 @@ export default defineComponent({
       if (choiceTimer.value)
         choiceTimer.value.reset(true);
     }
+
+// New function to handle already finished games
+function finishedGameBefore() {
+  console.log("Game was finished before, no upload required.");
+  gameFinished.value = true;  // Mark the game as finished
+  useTimer.value = false;
+  emit('gameFinished');  // Emit the 'gameFinished' event
+}
 
     function finishGame() {
       gameFinished.value = true; // Set the game as finished, showing the download button and results

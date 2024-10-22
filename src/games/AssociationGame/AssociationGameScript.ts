@@ -16,6 +16,11 @@ import { database } from '@/../firebaseConfig.js';
 import * as fabric from 'fabric';
 import { v4 as uuid } from 'uuid';
 import { loadFromFirebase } from '@/Utils/LoadFromFirebase';
+import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
+import { authentication } from '@/../firebaseConfig.js'; // Import authentication
+import { sessionId } from '@/app';  // Assuming sessionId is available here
+import { uploadResult } from '@/Utils/UploadToFirebase';
+
 
 
 interface InfluenceZoneData {
@@ -49,7 +54,6 @@ export default defineComponent({
       new EmojiTool()
     ];
 
-    // Define an async function inside the onMounted hook
     onMounted(async () => {
       try {
         // Fetch InfluenceZone data from Firebase (ensure it matches the type)
@@ -59,70 +63,100 @@ export default defineComponent({
           const canvas = whiteBoard.value.canvas();
           const isUpdatingFromFirebase = false;
     
-          // Correctly type the totalZoneSize
-          const totalZoneSize = InfluenceZoneData.reduce((total: number, zone: InfluenceZoneData) => total + zone.size, 0);
-    
           // Get canvas dimensions
           const canvasWidth = canvas.getWidth();
           const canvasHeight = canvas.getHeight();
-          const canvasArea = canvasWidth * canvasHeight;
     
-          InfluenceZoneData.forEach((zoneData, index) => {
-            // Scale the size based on the canvas size
-            const zoneSizeRatio = zoneData.size / totalZoneSize;
-            const zoneArea = canvasArea * zoneSizeRatio;
-            const zoneSideLength = Math.sqrt(zoneArea); // Assume square zones
+          // Maximum columns allowed for the grid system (up to 4 columns)
+          const maxColumns = 4;
     
-            // Create InfluenceZone object
-            const zone = new InfluenceZone(
-              zoneSideLength/3, // scaled zone size
-              zoneData.name,
-              zoneData.color,
-              zoneData.bordercolor,
-              zoneData.bordersize,
-              zoneData.fontsize,
-              zoneData.fontcolor,
-              zoneData.image
-            );
+          // Determine the number of zones
+          const zoneCount = InfluenceZoneData.length;
     
-            // Calculate positions based on grid or other layout logic
-            console.log(zoneSideLength )
-            const x = zoneSideLength*index + (zoneSideLength/3) // Example grid logic: 3 zones per row
-            const y = Math.floor(index / 3) * (canvasHeight / 3);  // Move to the next row after 3 zones
-            // Place the zone on canvas
-            console.log(x, y)
-            zone.placeOnCanvas(canvas, { x, y });
-          });
+          // Calculate the optimal number of rows and columns based on the zone count
+          let columns = 0;
+          let rows = 0;
     
-          // Canvas events
-          canvas.on('object:added', (target) => {
-            if (!isUpdatingFromFirebase) {
-              const object = target.target;
-              object.set({ ID: uuid() });
-              writeObject(object);
+          if (zoneCount <= 3) {
+            // For 1 to 3 zones, use only 1 row, and columns match the zone count
+            columns = zoneCount;
+            rows = 1;
+          } else if (zoneCount <= 4) {
+            // For 4 zones, use a 2x2 grid (2 rows, 2 columns)
+            columns = 2;
+            rows = Math.ceil(zoneCount / columns);
+          } else if (zoneCount <= 6) {
+            // For 5 to 6 zones, use a 3-column layout (3 columns, 2 rows)
+            columns = 3;
+            rows = Math.ceil(zoneCount / columns);
+          } else if (zoneCount <= 8) {
+            // For 7 to 8 zones, use a 4-column layout (4 columns, 2 rows)
+            columns = 4;
+            rows = Math.ceil(zoneCount / columns);
+          } else {
+            // For more than 8 zones, cap columns at 4 and calculate rows
+            columns = maxColumns;
+            rows = Math.ceil(zoneCount / columns);
+          }
+    
+          // Determine the width and height of each grid cell
+          const gridCellWidth = canvasWidth / columns;
+          const gridCellHeight = canvasHeight / rows;
+    
+          // Calculate the optimal zone size, taking minor spacing into account
+          const minorSpacingRatio = 0.05; // 5% spacing between zones
+          const availableGridCellSize = Math.min(gridCellWidth, gridCellHeight);
+          const zoneSideLength = availableGridCellSize * (1 - minorSpacingRatio); // Size the zone with minor spacing
+    
+          // Calculate how to distribute zones across rows
+          const zonesPerRow = [];  // Use 'const' here as recommended
+          let remainingZones = zoneCount;
+    
+          // Distribute zones across rows to balance them optimally
+          for (let i = 0; i < rows; i++) {
+            const zonesInCurrentRow = Math.min(remainingZones, columns);
+            zonesPerRow.push(zonesInCurrentRow);
+            remainingZones -= zonesInCurrentRow;
+          }
+    
+          // Iterate through each zone and place them based on the row/column logic
+          let zoneIndex = 0;
+          zonesPerRow.forEach((zonesInRow, rowIndex) => {
+            for (let colIndex = 0; colIndex < zonesInRow; colIndex++) {
+              const zoneData = InfluenceZoneData[zoneIndex];
+    
+              // Create InfluenceZone object with scaled size
+              const zone = new InfluenceZone(
+                zoneSideLength/2,        // scaled zone size based on grid cell size
+                zoneData.name,
+                zoneData.color,
+                zoneData.bordercolor,
+                zoneData.bordersize,
+                zoneData.fontsize,
+                zoneData.fontcolor,
+                zoneData.image
+              );
+    
+              // Calculate the center position of each grid cell
+              const x = (colIndex + 0.5) * gridCellWidth;   // Centered within the column
+              const y = (rowIndex + 0.5) * gridCellHeight;  // Centered within the row
+    
+              // Log positions for debugging
+              console.log(`Zone ${zoneIndex} - X: ${x}, Y: ${y}, Size: ${zoneSideLength}`);
+    
+              // Place the zone on canvas at the calculated X and Y positions
+              zone.placeOnCanvas(canvas, { x, y });
+    
+              // Increment the zone index for the next iteration
+              zoneIndex++;
             }
           });
-    
-          canvas.on('object:modified', (target) => {
-            if (!isUpdatingFromFirebase) {
-              const object = target.target;
-              writeObject(object);
-            }
-          });
-    
-          canvas.on('object:removed', (target) => {
-            if (!isUpdatingFromFirebase) {
-              const object = target.target;
-              deleteObject(object);
-            }
-          });
-    
-          const updateRef = dbRef(database, 'canvasObjects/update/');
         }
       } catch (error) {
-        console.error("Error loading InfluenceZone data:", error);
+        console.error("Error loading InfluenceZones:", error);
       }
     });
+    
 
     function writeObject(object: fabric.FabricObject) {
       const ID = object.get('ID') as string;
@@ -140,8 +174,34 @@ export default defineComponent({
     }
 
     function onFinish() {
-      emit('gameFinished');
+      uploadResult('AssociationGame',{finished:true})
+/*       uploadResult();  // Call function to upload result
+ */      emit('gameFinished');
     }
+
+   /*  async function uploadResult() {
+      const userUID = authentication.currentUser?.uid;
+      const storage = getStorage();
+    
+      if (!userUID) {
+        console.error("User is not authenticated, cannot upload result.");
+        return;
+      }
+      const resultData = JSON.stringify({ finishgame: true });
+      const blob = new Blob([resultData], { type: 'application/json' });
+    
+      // Define the file path in Firebase Storage
+      const filePath = `${sessionId}/AssociationGame/Results/${userUID}.json`;
+      const fileRef = storageRef(storage, filePath);
+    
+      try {
+        // Upload the JSON file to Firebase Storage
+        await uploadBytes(fileRef, blob);
+        console.log('Game result uploaded successfully');
+      } catch (error) {
+        console.error('Error uploading game result:', error);
+      }
+    } */
 
     return {
       whiteBoard,

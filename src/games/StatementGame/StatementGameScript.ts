@@ -46,9 +46,43 @@ export default defineComponent({
     const isLoading = ref(true);
 
     onMounted(async () => {
-      await fetchData();
-      choiceTimer.value?.start();
+      const userUID = authentication.currentUser?.uid;
+      const sessionIdValue = sessionId;
+    
+      if (!userUID || !sessionIdValue) {
+        throw new Error("User not authenticated or sessionId is missing.");
+      }
+    
+      // Check if result already exists
+      const resultExists = await checkIfResultExists(userUID, sessionIdValue);
+    
+      if (resultExists) {
+        console.log("Result exists for user, skipping the game.");
+        finishedGameBefore();  // Automatically finish the game without uploading
+      } else {
+        console.log("Result does not exist, proceeding with the game.");
+        await fetchData();  // Proceed with fetching data and starting the game
+        choiceTimer.value?.start();  // Start the timer
+      }
     });
+
+    async function checkIfResultExists(userUID: string, sessionId: string): Promise<boolean> {
+      const location = storageRef(storage, `${sessionId}/DilemmaGame/Results/${userUID}.json`);
+    
+      try {
+        await getDownloadURL(location);  // Attempt to fetch the file URL
+        console.log(`File found at: ${location.fullPath}`);  // Log if file exists
+        return true;  // File exists
+      } catch (error: any) {
+        if (error.code === 'storage/object-not-found') {
+          console.log("File not found in Firebase Storage.");
+          return false;  // File doesn't exist
+        } else {
+          console.error("Error checking for result file:", error);
+          throw error;  // Other errors should be handled
+        }
+      }
+    }
 
     async function fetchData() {
       try {
@@ -104,6 +138,11 @@ export default defineComponent({
       });
 
       incrementRound();
+    }
+
+    function finishedGameBefore() {
+      console.log("Game was finished before, no upload required.");
+      emit('gameFinished');  // Emit the 'gameFinished' event
     }
 
     async function uploadResult() {

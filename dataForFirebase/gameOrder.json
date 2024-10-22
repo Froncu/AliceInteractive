@@ -1,5 +1,5 @@
 {
-    "game1": "AssociationGame",
+    "game1": "PairWiseGame",
     "game2": "StatementGame",
-    "game3": "PairWiseGame"
+    "game3": "AssociationGame"
   }

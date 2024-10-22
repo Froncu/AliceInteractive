@@ -1,0 +1,37 @@
+.main-page {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 16px;
+}
+
+input {
+  padding: 8px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  display: block;
+  width: 100%;
+  max-width: 300px;
+}
+
+.error {
+  color: red;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.folder-selection {
+  margin-bottom: 20px;
+}
+
+select {
+  margin: 10px;
+  padding: 5px;
+}

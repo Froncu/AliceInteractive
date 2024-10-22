@@ -12,8 +12,16 @@ export default defineComponent({
       });
     }
 
+    function goToAdminPage() {
+      router.push({
+        name: 'adminPage',
+        query: { sessionId: sessionId }
+      });
+    }
+
     return {
-      startGames
+      startGames,
+      goToAdminPage
     };
   }
 });

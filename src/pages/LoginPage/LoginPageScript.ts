@@ -2,7 +2,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import { authentication } from '@/../firebaseConfig.js';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { router } from '@/router';
-import { sessionId } from '@/app';
+//import { sessionId } from '@/app';
 
 export default defineComponent({
   name: 'LoginPage',
@@ -19,7 +19,6 @@ export default defineComponent({
         error.value = '';
         router.push({
           name: 'mainPage',
-          query: { sessionId: sessionId }
         });
       })
     })

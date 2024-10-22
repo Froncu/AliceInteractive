@@ -1,7 +1,7 @@
 import { onMounted } from 'vue';
 import { router } from './router';
 
-export const sessionId = 'Test01';
+export const sessionId = 'Funtest';
 
 export default {
   name: 'App',

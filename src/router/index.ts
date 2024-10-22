@@ -3,6 +3,7 @@ import LoginPage from '@/pages/LoginPage/LoginPage.vue';
 import MainPage from '@/pages/MainPage/MainPage.vue';
 import GamePage from '@/pages/GamePage/GamePage.vue';
 import FinishedPage from '@/pages/FinishedPage/FinishedPage.vue';
+import AdminPage from '@/pages/AdminPage/AdminPage.vue';
 
 
 const routes = [
@@ -25,6 +26,11 @@ const routes = [
     path: '/FinishedPage',
     name: 'finishedPage',
     component: FinishedPage
+  },
+  {
+    path: '/AdminPage',
+    name: 'adminPage',
+    component: AdminPage
   }
 ];
 

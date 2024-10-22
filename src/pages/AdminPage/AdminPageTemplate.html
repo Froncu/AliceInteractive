@@ -1,0 +1,50 @@
+<div class="main-page">
+  <div class="folder-selection">
+    <h2>Select a Folder</h2>
+
+    <select v-model="selectedFolder">
+      <option value="">Select a folder...</option>
+      <option v-for="folder in rootFolders" :key="folder" :value="folder">{{ folder }}</option>
+    </select>
+
+    <button @click="uploadFolderString" :disabled="isUploadButtonDisabled">Upload Folder String</button>
+  </div>
+
+  <div class="game-order">
+    <h2>Game Order</h2>
+
+    <label for="game1">game1</label>
+    <select v-model="selectedGames.game1" @change="onSelect('game1')">
+      <option value="">Select a game...</option>
+      <option v-for="game in availableGames('game1')" :key="game" :value="game">{{ game }}</option>
+    </select>
+
+    <label for="game2">game2</label>
+    <select v-model="selectedGames.game2" :disabled="!selectedGames.game1" @change="onSelect('game2')">
+      <option value="">Select a game...</option>
+      <option v-for="game in availableGames('game2')" :key="game" :value="game">{{ game }}</option>
+    </select>
+
+    <label for="game3">game3</label>
+    <select v-model="selectedGames.game3" :disabled="!selectedGames.game2" @change="onSelect('game3')">
+      <option value="">Select a game...</option>
+      <option v-for="game in availableGames('game3')" :key="game" :value="game">{{ game }}</option>
+    </select>
+  </div>
+
+  <div v-if="selectedGames.game1 === 'DilemmaGame' || selectedGames.game2 === 'DilemmaGame' || selectedGames.game3 === 'DilemmaGame'">
+    <h2>Upload Images for DilemmaGame</h2>
+    <input type="file" multiple @change="handleDilemmaImageChange" />
+  </div>
+
+  <div v-if="selectedGames.game1 === 'PairWiseGame' || selectedGames.game2 === 'PairWiseGame' || selectedGames.game3 === 'PairWiseGame'">
+    <h2>Upload Images for PairWiseGame</h2>
+    <input type="file" multiple @change="handlePairwiseImageChange" />
+  </div>
+
+  <input v-model="folderName" placeholder="Enter new folder name" />
+  <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+  <button @click="dupFolder" :disabled="isFolderDuplicationDisabled">FOLDER DUPLICATE</button>
+
+  <p v-if="gameOrderError" class="error">{{ gameOrderError }}</p>
+</div>

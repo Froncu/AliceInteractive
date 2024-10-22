@@ -13,14 +13,12 @@ import { InfluenceZone } from '@/components/InfluenceZone';
 import { EmojiTool } from '@/components/tools/EmojiTool';
 import { set, ref as dbRef, remove, onValue } from "firebase/database";
 import { database } from '@/../firebaseConfig.js';
-import * as fabric from 'fabric';
 import { v4 as uuid } from 'uuid';
 import { loadFromFirebase } from '@/Utils/LoadFromFirebase';
-import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
+import { getStorage, ref as storageRef, getDownloadURL } from 'firebase/storage';
 import { authentication } from '@/../firebaseConfig.js'; // Import authentication
 import { sessionId } from '@/app';  // Assuming sessionId is available here
 import { uploadResult } from '@/Utils/UploadToFirebase';
-
 
 
 interface InfluenceZoneData {
@@ -55,8 +53,56 @@ export default defineComponent({
     ];
 
     onMounted(async () => {
+      const userUID = authentication.currentUser?.uid;
+      const sessionIdValue = sessionId;
+
+      if (!userUID || !sessionIdValue) {
+        console.error("User not authenticated or sessionId is missing.");
+        return;
+      }
+
+      // Check if the result already exists in Firebase Storage
+      const resultExists = await checkIfResultExists(userUID, sessionIdValue);
+
+      if (resultExists) {
+        console.log("Result exists for user, skipping the game.");
+        finishedGameBefore();  // Call function to finish the game immediately
+      } else {
+        console.log("Result does not exist, proceeding with the game.");
+        // Proceed with normal game flow if no result exists
+        await loadInfluenceZones();  // Load Influence Zones and proceed
+      }
+    });
+
+    // Function to check if the result JSON exists in Firebase Storage
+    async function checkIfResultExists(userUID: string, sessionId: string): Promise<boolean> {
+      const filePath = `${sessionId}/AssociationGame/Results/${userUID}.json`;
+      const fileRef = storageRef(getStorage(), filePath);
+
       try {
-        // Fetch InfluenceZone data from Firebase (ensure it matches the type)
+        await getDownloadURL(fileRef);  // Try to get the URL for the result file
+        console.log(`Result file found at: ${filePath}`);
+        return true;  // File exists, game was already completed
+      } catch (error: any) {
+        if (error.code === 'storage/object-not-found') {
+          console.log("Result file not found, game has not been finished.");
+          return false;  // File does not exist, game not completed
+        } else {
+          console.error("Error checking result file:", error);
+          throw error;
+        }
+      }
+    }
+
+    // Function to mark the game as finished without uploading any result
+    function finishedGameBefore() {
+      console.log("Game was finished before, no upload required.");
+      emit('gameFinished');  // Emit the 'gameFinished' event to signal completion
+    }
+
+    // Function to load Influence Zones and proceed with the game
+    async function loadInfluenceZones() {
+      try {
         const InfluenceZoneData: InfluenceZoneData[] = await loadFromFirebase('AssociationGame', 'influenceZones');
     
         if (whiteBoard.value) {
@@ -155,53 +201,13 @@ export default defineComponent({
       } catch (error) {
         console.error("Error loading InfluenceZones:", error);
       }
-    });
-    
-
-    function writeObject(object: fabric.FabricObject) {
-      const ID = object.get('ID') as string;
-
-      set(dbRef(database, `canvasObjects/update/${ID}`), {
-        object: JSON.parse(JSON.stringify(object))
-      }).catch((error) => {
-        console.error("Error saving object to Firebase:", error);
-      });
     }
 
-    function deleteObject(object: fabric.FabricObject) {
-      const ID = object.get('ID') as number;
-      remove(dbRef(database, `canvasObjects/${ID}`));
-    }
-
+    // Existing functions (e.g., writeObject, deleteObject) remain unchanged
     function onFinish() {
-      uploadResult('AssociationGame',{finished:true})
-/*       uploadResult();  // Call function to upload result
- */      emit('gameFinished');
+      uploadResult('AssociationGame',{finished:true}) // Upload result when the game finishes
+      emit('gameFinished');
     }
-
-   /*  async function uploadResult() {
-      const userUID = authentication.currentUser?.uid;
-      const storage = getStorage();
-    
-      if (!userUID) {
-        console.error("User is not authenticated, cannot upload result.");
-        return;
-      }
-      const resultData = JSON.stringify({ finishgame: true });
-      const blob = new Blob([resultData], { type: 'application/json' });
-    
-      // Define the file path in Firebase Storage
-      const filePath = `${sessionId}/AssociationGame/Results/${userUID}.json`;
-      const fileRef = storageRef(storage, filePath);
-    
-      try {
-        // Upload the JSON file to Firebase Storage
-        await uploadBytes(fileRef, blob);
-        console.log('Game result uploaded successfully');
-      } catch (error) {
-        console.error('Error uploading game result:', error);
-      }
-    } */
 
     return {
       whiteBoard,

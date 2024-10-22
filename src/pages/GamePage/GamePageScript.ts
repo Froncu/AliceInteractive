@@ -36,7 +36,7 @@ export default defineComponent({
 
     function nextGame() {
       if (gameIndex.value == games.value.length - 1)
-        router.push('mainPage');
+        router.push('finishedPage');
       else {
         currentGame.value = games.value[++gameIndex.value];
         gameProgress.value?.nextStep();

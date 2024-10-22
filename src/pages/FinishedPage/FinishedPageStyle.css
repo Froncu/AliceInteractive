@@ -1,0 +1,11 @@
+.main-page {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px; /* Make the text larger */
+    color: black; /* Ensure the text is visible */
+    background-color: white; /* Add a background if needed */
+    padding: 20px; /* Add padding around the text */
+    border: 1px solid black; /* Optional: add a border to see the area */
+}

@@ -104,7 +104,19 @@ export default defineComponent({
     async function loadInfluenceZones() {
       try {
         const InfluenceZoneData: InfluenceZoneData[] = await loadFromFirebase('AssociationGame', 'influenceZones');
-    
+            
+        // Fetch 1s for each Influence Zone from Firebase Storage
+            for (const zone of InfluenceZoneData) {
+              const imagePath = `${sessionId}/AssociationGame/${zone.image}`;  // Firebase path to the image
+              const imageRef = storageRef(getStorage(), imagePath);
+              try {
+                zone.image = await getDownloadURL(imageRef);  // Update the image field with the Firebase URL
+                console.log(`Image loaded for zone: ${zone.name}, URL: ${zone.image}`);
+              } catch (error) {
+                console.error(`Failed to load image for zone: ${zone.name}`, error);
+              }
+            }
+
         if (whiteBoard.value) {
           const canvas = whiteBoard.value.canvas();
           const isUpdatingFromFirebase = false;

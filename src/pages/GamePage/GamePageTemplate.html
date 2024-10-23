@@ -2,5 +2,5 @@
 <div class="game-container">
   <AssociationGame v-if="currentGame == 'AssociationGame'" @gameFinished="nextGame" />
   <PairWiseGame v-if="currentGame == 'PairWiseGame'" @gameFinished="nextGame" />
-  <StatementGame v-if="currentGame == 'StatementGame'" @gameFinished="nextGame" />
+  <DilemmaGame v-if="currentGame == 'DilemmaGame'" @gameFinished="nextGame" />
 </div>

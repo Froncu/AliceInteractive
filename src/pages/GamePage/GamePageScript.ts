@@ -4,7 +4,7 @@ import { ref as storageRef, getDownloadURL } from 'firebase/storage';
 import GameProgress from '@/components/GameProgress/GameProgress.vue';
 import AssociationGame from '@/games/AssociationGame/AssociationGame.vue';
 import PairWiseGame from '@/games/PairWiseGame/PairWiseGame.vue';
-import StatementGame from '@/games/StatementGame/StatementGame.vue';
+import DilemmaGame from '@/games/DilemmaGame/DilemmaGame.vue';
 import { router } from '@/router';
 
 export default defineComponent({
@@ -13,7 +13,7 @@ export default defineComponent({
     GameProgress,
     AssociationGame,
     PairWiseGame,
-    StatementGame
+    DilemmaGame
   },
   setup() {
     const gameProgress = ref<InstanceType<typeof GameProgress>>();

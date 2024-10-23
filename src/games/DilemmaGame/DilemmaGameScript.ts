@@ -17,7 +17,7 @@ class Round {
 }
 
 export default defineComponent({
-  name: 'StatementGame',
+  name: 'DilemmaGame',
   emits: [
     'gameFinished'
   ],

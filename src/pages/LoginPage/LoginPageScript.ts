@@ -2,7 +2,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import { authentication } from '@/../firebaseConfig.js';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { router } from '@/router';
-//import { sessionId } from '@/app';
+import { sessionId } from '@/app';  // Import sessionId from app
 
 export default defineComponent({
   name: 'LoginPage',
@@ -13,15 +13,17 @@ export default defineComponent({
 
     onMounted(() => {
       onAuthStateChanged(authentication, (user) => {
-        if (!user)
-          return;
+        if (!user) return;
 
         error.value = '';
+
+        // Make sure the sessionId is passed when redirecting to mainPage
         router.push({
           name: 'mainPage',
+          query: { sessionId: sessionId }  // Pass sessionId in the query
         });
-      })
-    })
+      });
+    });
 
     function setError(error: any) {
       error.value = `Error: ${error.message} (Code: ${error.code})`;

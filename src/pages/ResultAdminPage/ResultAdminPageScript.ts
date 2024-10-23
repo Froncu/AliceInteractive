@@ -5,7 +5,7 @@ import { duplicateFolder } from '@/Utils/DuplicateFromFirebase';
 type GameKeys = 'game1' | 'game2' | 'game3';
 
 export default defineComponent({
-  name: 'AdminPage',
+  name: 'ResultAdminPage',
   setup() {
     const folderName = ref('');
     const errorMessage = ref('');

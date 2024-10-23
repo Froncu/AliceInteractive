@@ -2,6 +2,8 @@ import * as fabric from 'fabric';
 import { BaseTool, BaseToolSettings } from '@/components/tools/BaseTool';
 import { ref, defineAsyncComponent } from 'vue';
 import { getStorage, ref as storageRef, getDownloadURL, StorageReference } from 'firebase/storage';
+import { sessionId } from '@/app';
+
 
 export class EmojiToolSettings extends BaseToolSettings {
   query = "";
@@ -52,7 +54,7 @@ export class EmojiTool extends BaseTool {
   }
 
   private async loadEmojis(): Promise<void> {
-    const assetsDirectory = 'Test01/AssociationGame/';
+    const assetsDirectory = `${sessionId}/AssociationGame/`;
     this.m_fileRef = storageRef(this.m_storage, assetsDirectory + 'emojis.json');
     const url = await getDownloadURL(this.m_fileRef);
 

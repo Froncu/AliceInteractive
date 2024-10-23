@@ -1,14 +1,4 @@
 <div class="main-page">
-  <div class="folder-selection">
-    <h2>Select a Folder</h2>
-
-    <select v-model="selectedFolder">
-      <option value="">Select a folder...</option>
-      <option v-for="folder in rootFolders" :key="folder" :value="folder">{{ folder }}</option>
-    </select>
-
-    <button @click="uploadFolderString" :disabled="isUploadButtonDisabled">Upload Folder String</button>
-  </div>
 
   <div class="game-order">
     <h2>Game Order</h2>

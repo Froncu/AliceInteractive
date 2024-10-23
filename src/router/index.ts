@@ -4,6 +4,8 @@ import MainPage from '@/pages/MainPage/MainPage.vue';
 import GamePage from '@/pages/GamePage/GamePage.vue';
 import FinishedPage from '@/pages/FinishedPage/FinishedPage.vue';
 import AdminPage from '@/pages/AdminPage/AdminPage.vue';
+import ResultAdminPage from '@/pages/ResultAdminPage/ResultAdminPage.vue';
+
 import { sessionId } from '@/app';
 
 //const routeSessionId= sessionId
@@ -33,6 +35,11 @@ const routes = [
     path: `/AdminPage`,
     name: 'adminPage',
     component: AdminPage
+  },
+  {
+    path: `/ResultAdminPage`,
+    name: 'resultAdminPage',
+    component: ResultAdminPage
   }
 ];
 

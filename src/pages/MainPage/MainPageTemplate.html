@@ -1,5 +1,8 @@
 <div class="main-page">
-    <button @click="startGames">Play</button>
-    <button @click="goToAdminPage">Admin</button>
-  </div>
+  <!-- Start button is always displayed -->
+  <button @click="startGames">Play</button>
   
+  <!-- Conditionally render the Admin and ResultAdmin buttons -->
+  <button v-if="isAdmin" @click="goToAdminPage">Admin</button>
+  <button v-if="isAdmin" @click="goToResultAdminPage">ResultAdmin</button>
+</div>

@@ -1,76 +1,59 @@
-<div class="main-page">
+<div class="result-admin-page">
+  <!-- Folder Selection -->
   <div class="folder-selection">
     <h2>Select a Folder</h2>
-
-    <select v-model="selectedFolder">
+    <select v-model="selectedFolder" @change="fetchSessionData">
       <option value="">Select a folder...</option>
       <option v-for="folder in rootFolders" :key="folder" :value="folder">{{ folder }}</option>
     </select>
-
-    <button @click="uploadFolderString" :disabled="isUploadButtonDisabled">Upload Folder String</button>
   </div>
 
-  <div class="game-order">
-    <h2>Game Order</h2>
-
-    <label for="game1">game1</label>
-    <select v-model="selectedGames.game1" @change="onSelect('game1')">
-      <option value="">Select a game...</option>
-      <option v-for="game in availableGames('game1')" :key="game" :value="game">{{ game }}</option>
-    </select>
-
-    <label for="game2">game2</label>
-    <select v-model="selectedGames.game2" :disabled="!selectedGames.game1" @change="onSelect('game2')">
-      <option value="">Select a game...</option>
-      <option v-for="game in availableGames('game2')" :key="game" :value="game">{{ game }}</option>
-    </select>
-
-    <label for="game3">game3</label>
-    <select v-model="selectedGames.game3" :disabled="!selectedGames.game2" @change="onSelect('game3')">
-      <option value="">Select a game...</option>
-      <option v-for="game in availableGames('game3')" :key="game" :value="game">{{ game }}</option>
-    </select>
+  <!-- Display message if session ID not found -->
+  <div v-if="sessionNotFound" class="error-message">
+    <p>No session ID found.</p>
   </div>
 
-  <!-- PairWiseGame Upload Section -->
-  <div v-if="selectedGames.game1 === 'PairWiseGame' || selectedGames.game2 === 'PairWiseGame' || selectedGames.game3 === 'PairWiseGame'" class="game-section">
-    <h2>Upload Images and Details for PairWiseGame</h2>
-    <input type="file" multiple @change="handlePairwiseImageChange" />
-    <div v-for="(image, index) in pairwisegameImages" :key="index" class="image-details">
-      <h3>Details for Image {{ index + 1 }}</h3>
-      <label>Title:</label>
-      <input type="text" v-model="pairwisegameTitles[index]" @input="handlePairwiseTitleChange($event, index)" />
-      <label>Description:</label>
-      <textarea v-model="pairwisegameDescriptions[index]" @input="handlePairwiseDescriptionChange($event, index)"></textarea>
+  <!-- PairWiseGame Results Section -->
+  <div v-if="!isLoading && !sessionNotFound && totalScores.length > 0" class="result-container pairwise-result-section">
+    <h2 class="result-title">PairWiseGame Results - Favorites</h2>
+    <div class="result-list">
+      <div v-for="(score, index) in totalScores" :key="index" class="result-item">
+        <div class="image-container">
+          <img :src="score.imagePath" alt="Image" />
+        </div>
+        <div class="result-text">
+          <p>{{ score.totalScore }} - {{ score.description || 'No title available' }}</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- DilemmaGame Upload Section -->
-  <div v-if="selectedGames.game1 === 'DilemmaGame' || selectedGames.game2 === 'DilemmaGame' || selectedGames.game3 === 'DilemmaGame'" class="game-section">
-    <h2>Upload Images and Details for DilemmaGame</h2>
-    <input type="file" multiple @change="handleDilemmaImageChange" />
-    <div v-for="(image, index) in dilemmagameImages" :key="index" class="image-details">
-      <h3>Details for Center Image {{ index + 1 }}</h3>
-      <label>Center Text:</label>
-      <input type="text" v-model="dilemmagameCenterTexts[index]" @input="handleDilemmaCenterTextChange($event, index)" />
+  <!-- DilemmaGame Results Section -->
+  <div v-if="!isLoading && !sessionNotFound && dilemmaStats.length > 0" class="result-container dilemma-result-section">
+    <h2 class="result-title">DilemmaGame Results</h2>
+    <div class="result-list">
+      <div v-for="(stat, index) in dilemmaStats" :key="index" class="result-item">
+        <div class="image-container">
+          <img :src="stat.imagePath" alt="Image" />
+        </div>
+        <div class="result-text">
+          <p>{{ stat.givenText || 'No text available' }}</p>
+        </div>
+        <div class="like-dislike-count">
+          <p class="likes">Likes: {{ stat.likes }}</p>
+          <p class="dislikes">Dislikes: {{ stat.dislikes }}</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- AssociationGame Upload Section -->
-  <div v-if="selectedGames.game1 === 'AssociationGame' || selectedGames.game2 === 'AssociationGame' || selectedGames.game3 === 'AssociationGame'" class="game-section">
-    <h2>Upload Images and Details for AssociationGame</h2>
-    <input type="file" multiple @change="handleAssociationImageChange" />
-    <p v-if="associationImageLimitReached" class="error">You can upload up to 12 images only.</p>
-    <div v-for="(image, index) in associationgameImages" :key="index" class="image-details">
-      <h3>Details for Image {{ index + 1 }}</h3>
-      <label>Title:</label>
-      <input type="text" v-model="associationgameTitles[index]" @input="handleAssociationTitleChange($event, index)" />
-    </div>
+  <!-- Loading state -->
+  <div v-if="isLoading" class="loading-message">
+    <p>Loading...</p>
   </div>
 
-  <input v-model="folderName" placeholder="Enter new folder name" />
-  <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-  <button @click="dupFolder" :disabled="isFolderDuplicationDisabled">FOLDER DUPLICATE</button>
-
-  <p v-if="gameOrderError" class="error">{{ gameOrderError }}</p>
+  <!-- Error message -->
+  <div v-if="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
 </div>

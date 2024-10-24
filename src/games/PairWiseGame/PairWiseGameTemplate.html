@@ -1,6 +1,8 @@
 <div class="pair-wise-comparison">
   <LoadingScreen v-if="isLoading" />
   <div v-else>
+    <ChoiceTimer ref="choiceTimer" startSeconds="20" @elapsed="handleTimeUp"></ChoiceTimer>
+
     <div class="background-container">
       <BackGround />
     </div>
@@ -19,8 +21,5 @@
         <button @click="downloadJSON">Download Sorted Cards</button>
       </div>
     </div>
-    <div v-if="useTimer">
-      <ChoiceTimer ref="choiceTimer" startSeconds="20" @elapsed="handleTimeUp"></ChoiceTimer>
-    </div>
   </div>
-</div>
+</div> 

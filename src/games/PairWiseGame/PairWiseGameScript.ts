@@ -33,17 +33,16 @@ export default defineComponent({
     const selectedCardId = ref<number | null>(null);
     const resolveSelection = ref<((id: number) => void) | null>(null);
     const gameFinished = ref<boolean>(false);
-    const choiceTimer = ref<InstanceType<typeof ChoiceTimer> | null>();
+    const choiceTimer = ref<InstanceType<typeof ChoiceTimer>>();
     const useTimer = ref(true);
     let uploaded = false; // To prevent multiple uploads
+
 
 
     const storage = getStorage();
     const isLoading = ref(true);
 
-    onMounted(async () => {
-      if (choiceTimer.value) choiceTimer.value.start();
-      
+    onMounted(async () => {      
       try {
         const userUID = authentication.currentUser?.uid;
         const sessionIdValue = sessionId;
@@ -60,6 +59,7 @@ export default defineComponent({
           finishedGameBefore();  // Automatically finish the game without uploading
         } else {
           console.log("Result does not exist, proceeding with the game.");
+          choiceTimer.value?.start();  // Start the timer
           await loadData();  // Load the game data
           isLoading.value = false;
           sortedCards.value = await quickSort(cards.value);  // Sort the cards
@@ -161,8 +161,7 @@ export default defineComponent({
         resolveSelection.value = null; // Reset the resolve function for the next selection
       }
 
-      if (choiceTimer.value)
-        choiceTimer.value.reset(true);
+        choiceTimer.value?.reset(true);
     }
 
 // New function to handle already finished games
@@ -196,18 +195,6 @@ function finishedGameBefore() {
       }
     }
 
-    /*function downloadJSON() {
-      const dataStr = JSON.stringify(sortedCards.value, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sorted-cards.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }*/
-
     return {
       cards,
       sortedCards,
@@ -215,7 +202,6 @@ function finishedGameBefore() {
       selectedCardId,
       gameFinished,
       choiceTimer,
-      useTimer,
       isLoading,
       handleCardSelection,
       //downloadJSON, // Expose the download function to the template

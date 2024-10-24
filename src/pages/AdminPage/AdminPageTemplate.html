@@ -27,7 +27,7 @@
     <h2>Upload Images and Details for PairWiseGame</h2>
     <input type="file" multiple @change="handlePairwiseImageChange" />
     <div v-for="(image, index) in pairwisegameImages" :key="index" class="image-details">
-      <h3>Details for Image {{ index + 1 }}</h3>
+      <h3>Details for {{ image.name }}</h3>
       <label>Title:</label>
       <input type="text" v-model="pairwisegameTitles[index]" @input="handlePairwiseTitleChange($event, index)" />
       <label>Description:</label>
@@ -40,7 +40,7 @@
     <h2>Upload Images and Details for DilemmaGame</h2>
     <input type="file" multiple @change="handleDilemmaImageChange" />
     <div v-for="(image, index) in dilemmagameImages" :key="index" class="image-details">
-      <h3>Details for Center Image {{ index + 1 }}</h3>
+      <h3>Details for {{ image.name }}</h3>
       <label>Center Text:</label>
       <input type="text" v-model="dilemmagameCenterTexts[index]" @input="handleDilemmaCenterTextChange($event, index)" />
     </div>
@@ -52,7 +52,7 @@
     <input type="file" multiple @change="handleAssociationImageChange" />
     <p v-if="associationImageLimitReached" class="error">You can upload up to 12 images only.</p>
     <div v-for="(image, index) in associationgameImages" :key="index" class="image-details">
-      <h3>Details for Image {{ index + 1 }}</h3>
+      <h3>Details for {{ image.name }}</h3>
       <label>Title:</label>
       <input type="text" v-model="associationgameTitles[index]" @input="handleAssociationTitleChange($event, index)" />
     </div>

@@ -13,39 +13,39 @@
     <p>No session ID found.</p>
   </div>
 
-  <!-- PairWiseGame Results Section -->
-  <div v-if="!isLoading && !sessionNotFound && totalScores.length > 0" class="result-container pairwise-result-section">
-    <h2 class="result-title">PairWiseGame Results - Favorites</h2>
-    <div class="result-list">
-      <div v-for="(score, index) in totalScores" :key="index" class="result-item">
-        <div class="image-container">
-          <img :src="score.imagePath" alt="Image" />
-        </div>
-        <div class="result-text">
-          <p>{{ score.totalScore }} - {{ score.description || 'No title available' }}</p>
-        </div>
+<!-- PairWiseGame Results Section -->
+<div v-if="!isLoading && !sessionNotFound && totalScores.length > 0" class="result-container pairwise-result-section">
+  <h2 class="result-title">PairWiseGame Results - Favorites ({{ pairwiseJsonCount }} deelnames)</h2>
+  <div class="result-list">
+    <div v-for="(score, index) in totalScores" :key="index" class="result-item">
+      <div class="image-container">
+        <img :src="score.imagePath" alt="Image" />
+      </div>
+      <div class="result-text">
+        <p>{{ score.totalScore }} - {{ score.description || 'No title available' }}</p>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- DilemmaGame Results Section -->
-  <div v-if="!isLoading && !sessionNotFound && dilemmaStats.length > 0" class="result-container dilemma-result-section">
-    <h2 class="result-title">DilemmaGame Results</h2>
-    <div class="result-list">
-      <div v-for="(stat, index) in dilemmaStats" :key="index" class="result-item">
-        <div class="image-container">
-          <img :src="stat.imagePath" alt="Image" />
-        </div>
-        <div class="result-text">
-          <p>{{ stat.givenText || 'No text available' }}</p>
-        </div>
-        <div class="like-dislike-count">
-          <p class="likes">Likes: {{ stat.likes }}</p>
-          <p class="dislikes">Dislikes: {{ stat.dislikes }}</p>
-        </div>
+<!-- DilemmaGame Results Section -->
+<div v-if="!isLoading && !sessionNotFound && dilemmaStats.length > 0" class="result-container dilemma-result-section">
+  <h2 class="result-title">DilemmaGame Results ({{ dilemmaJsonCount }} deelnames)</h2>
+  <div class="result-list">
+    <div v-for="(stat, index) in dilemmaStats" :key="index" class="result-item">
+      <div class="image-container">
+        <img :src="stat.imagePath" alt="Image" />
+      </div>
+      <div class="result-text">
+        <p>{{ stat.givenText || 'No text available' }}</p>
+      </div>
+      <div class="like-dislike-count">
+        <p class="likes">Likes: {{ stat.likes }}</p>
+        <p class="dislikes">Dislikes: {{ stat.dislikes }}</p>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Loading state -->
   <div v-if="isLoading" class="loading-message">

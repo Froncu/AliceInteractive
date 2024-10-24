@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import { getStorage, ref as storageRef, listAll, getDownloadURL } from 'firebase/storage';
 
 // Define types for the result structures
@@ -45,6 +45,10 @@ export default defineComponent({
     const isLoading = ref(false);
     const errorMessage = ref('');
     const sessionNotFound = ref(false);  // Flag to show "no session ID found"
+    // Add these to the `setup` function
+    const pairwiseJsonCount = ref(0);  // Track the number of JSON files for PairWiseGame
+    const dilemmaJsonCount = ref(0);   // Track the number of JSON files for DilemmaGame
+
 
     // Fetch list of folders (session IDs) on component mount
     onMounted(async () => {
@@ -85,10 +89,13 @@ export default defineComponent({
       }
     }
 
+    
+
     // Fetch PairWiseGame results
     async function fetchPairWiseResults(sessionId: string) {
       const folderPath = `${sessionId}/PairWiseGame/Results/`;
       const resultFiles = await listAll(storageRef(storage, folderPath));
+      pairwiseJsonCount.value = resultFiles.items.length;  // Count the number of JSON files
       pairwiseResults.value = await loadResults<PairwiseResultItem>(resultFiles);
     }
 
@@ -96,6 +103,7 @@ export default defineComponent({
     async function fetchDilemmaResults(sessionId: string) {
       const folderPath = `${sessionId}/DilemmaGame/Results/`;
       const resultFiles = await listAll(storageRef(storage, folderPath));
+      dilemmaJsonCount.value = resultFiles.items.length;  // Count the number of JSON files
       dilemmaResults.value = await loadResults<DilemmaResultItem>(resultFiles);
     }
 
@@ -168,6 +176,8 @@ export default defineComponent({
       totalScores,
       dilemmaStats,
       fetchSessionData, // Trigger fetching session data when folder is selected
+      pairwiseJsonCount,  // Add this
+      dilemmaJsonCount,   // Add this
     };
   }
 });

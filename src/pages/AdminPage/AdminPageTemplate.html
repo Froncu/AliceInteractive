@@ -60,7 +60,8 @@
 
   <input v-model="folderName" placeholder="Enter new folder name" />
   <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-  <button @click="dupFolder" :disabled="isFolderDuplicationDisabled">FOLDER DUPLICATE</button>
+  <button @click="dupFolder" :disabled="isFolderDuplicationDisabled">Make new project</button>
+  <p v-if="duplicatedProjectLink">Project Link: <a :href="duplicatedProjectLink">{{ duplicatedProjectLink }}</a></p>
 
   <p v-if="gameOrderError" class="error">{{ gameOrderError }}</p>
 </div>

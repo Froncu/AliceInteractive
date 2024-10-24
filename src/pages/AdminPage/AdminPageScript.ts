@@ -36,6 +36,14 @@ export default defineComponent({
       game3: ''
     });
 
+    const duplicatedFolderLink = ref(''); // New ref to store the duplicated folder link
+
+const duplicatedProjectLink = computed(() => {
+  if (!duplicatedFolderLink.value) return '';
+  return `${window.location.origin}/MainPage?sessionId=${duplicatedFolderLink.value}`;
+});
+
+
     onMounted(async () => {
       const storageRefRoot = storageRef(storage, '/');
       try {
@@ -172,6 +180,8 @@ export default defineComponent({
         const influenceZonesBlob = new Blob([JSON.stringify(influenceZones, null, 2)], { type: 'application/json' });
         await uploadBytes(influenceZonesJsonRef, influenceZonesBlob);
         console.log('influenceZones.json updated successfully.');
+        duplicatedFolderLink.value = folderName.value;
+
 
       } catch (error) {
         console.error('Error uploading images or updating influenceZones.json:', error);
@@ -318,7 +328,9 @@ export default defineComponent({
       handleAssociationTitleChange,
       associationgameImages,
       associationgameTitles,
-      associationImageLimitReached
+      associationImageLimitReached,
+      duplicatedProjectLink // Return the computed link
+      
     };
   }
 });

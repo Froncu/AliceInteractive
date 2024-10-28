@@ -16,9 +16,10 @@ import { database } from '@/../firebaseConfig.js';
 import { v4 as uuid } from 'uuid';
 import { loadFromFirebase } from '@/Utils/LoadFromFirebase';
 import { getStorage, ref as storageRef, getDownloadURL, uploadBytes } from 'firebase/storage';
-import { authentication } from '@/../firebaseConfig.js'; // Import authentication
-import { sessionId } from '@/app';  // Assuming sessionId is available here
+import { authentication } from '@/../firebaseConfig.js';
+import { sessionId } from '@/app';
 import { uploadResult } from '@/Utils/UploadToFirebase';
+import testLoadData from '../testLoadData.json';
 
 interface InfluenceZoneData {
   size: number;
@@ -52,6 +53,14 @@ export default defineComponent({
     ];
 
     onMounted(async () => {
+       // Delay interaction with whiteBoard until it's initialized
+       if (!whiteBoard.value) {
+        console.error("WhiteBoard component is not initialized.");
+        return;
+      }
+      
+      // Confirm whiteBoard is ready to use
+      console.log("WhiteBoard component initialized:", whiteBoard.value);
       const userUID = authentication.currentUser?.uid;
       const sessionIdValue = sessionId;
 
@@ -60,42 +69,46 @@ export default defineComponent({
         return;
       }
 
-      // Check if the result already exists in Firebase Storage
       const resultExists = await checkIfResultExists(userUID, sessionIdValue);
 
       if (resultExists) {
         console.log("Result exists for user, skipping the game.");
-        finishedGameBefore();  // Call function to finish the game immediately
+        finishedGameBefore();
       } else {
         console.log("Result does not exist, proceeding with the game.");
-        // Proceed with normal game flow if no result exists
-        await loadInfluenceZones();  // Load Influence Zones and proceed
+        await loadInfluenceZones();
       }
     });
 
-    // Function to check if the result JSON exists in Firebase Storage
     async function checkIfResultExists(userUID: string, sessionId: string): Promise<boolean> {
       const filePath = `${sessionId}/AssociationGame/Results/${userUID}.json`;
       const fileRef = storageRef(getStorage(), filePath);
 
       try {
-        const fileURL = await getDownloadURL(fileRef);  // Try to get the URL for the result file
+        const fileURL = await getDownloadURL(fileRef);
         const response = await fetch(fileURL);
         const canvasJSON = await response.json();
 
         console.log(`Canvas JSON found at: ${filePath}`);
 
-        // Load the canvas from the JSON
         if (whiteBoard.value) {
           const canvas = whiteBoard.value.canvas();
-          canvas.loadFromJSON(canvasJSON, canvas.renderAll.bind(canvas));  // Load and render the canvas
+
+          // Ensure each image in the JSON is cross-origin
+          canvasJSON.objects.forEach((obj: any) => {
+            if (obj.type === 'image') {
+              obj.crossOrigin = 'anonymous';
+            }
+          });
+
+          canvas.loadFromJSON(canvasJSON, canvas.renderAll.bind(canvas));
           console.log("Canvas successfully loaded from JSON.");
         }
-        return true;  // File exists and canvas was successfully loaded
+        return true;
       } catch (error: any) {
         if (error.code === 'storage/object-not-found') {
           console.log("Result file not found, game has not been finished.");
-          return false;  // File does not exist, game not completed
+          return false;
         } else {
           console.error("Error checking result file:", error);
           throw error;
@@ -103,23 +116,31 @@ export default defineComponent({
       }
     }
 
-    // Function to mark the game as finished without uploading any result
     function finishedGameBefore() {
       console.log("Game was finished before, no upload required.");
-      emit('gameFinished');  // Emit the 'gameFinished' event to signal completion
+      emit('gameFinished');
     }
 
-    // Function to load Influence Zones and proceed with the game
     async function loadInfluenceZones() {
       try {
         const InfluenceZoneData: InfluenceZoneData[] = await loadFromFirebase('AssociationGame', 'influenceZones');
-            
-        // Fetch images for each Influence Zone from Firebase Storage
+
         for (const zone of InfluenceZoneData) {
-          const imagePath = `${sessionId}/AssociationGame/${zone.image}`;  // Firebase path to the image
+          const imagePath = `${sessionId}/AssociationGame/${zone.image}`;
           const imageRef = storageRef(getStorage(), imagePath);
           try {
-            zone.image = await getDownloadURL(imageRef);  // Update the image field with the Firebase URL
+            const imageUrl = await getDownloadURL(imageRef);
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.src = imageUrl;
+
+            // Wait for image to load
+            await new Promise((resolve) => {
+              img.onload = () => {
+                zone.image = img.src;
+                resolve(true);
+              };
+            });
             console.log(`Image loaded for zone: ${zone.name}, URL: ${zone.image}`);
           } catch (error) {
             console.error(`Failed to load image for zone: ${zone.name}`, error);
@@ -128,8 +149,6 @@ export default defineComponent({
 
         if (whiteBoard.value) {
           const canvas = whiteBoard.value.canvas();
-    
-          // Place zones on the canvas using grid layout logic (like in the original code)
           placeInfluenceZonesOnCanvas(canvas, InfluenceZoneData);
         }
       } catch (error) {
@@ -137,21 +156,14 @@ export default defineComponent({
       }
     }
 
-    // Function to place Influence Zones on the canvas using a grid layout
     function placeInfluenceZonesOnCanvas(canvas: any, InfluenceZoneData: InfluenceZoneData[]) {
       const isUpdatingFromFirebase = false;
 
-      // Get canvas dimensions
       const canvasWidth = canvas.getWidth();
       const canvasHeight = canvas.getHeight();
-
-      // Maximum columns allowed for the grid system (up to 4 columns)
       const maxColumns = 4;
-
-      // Determine the number of zones
       const zoneCount = InfluenceZoneData.length;
 
-      // Calculate the optimal number of rows and columns based on the zone count
       let columns = 0;
       let rows = 0;
 
@@ -172,16 +184,12 @@ export default defineComponent({
         rows = Math.ceil(zoneCount / columns);
       }
 
-      // Determine the width and height of each grid cell
       const gridCellWidth = canvasWidth / columns;
       const gridCellHeight = canvasHeight / rows;
-
-      // Calculate the optimal zone size, taking minor spacing into account
-      const minorSpacingRatio = 0.05; // 5% spacing between zones
+      const minorSpacingRatio = 0.05;
       const availableGridCellSize = Math.min(gridCellWidth, gridCellHeight);
-      const zoneSideLength = availableGridCellSize * (1 - minorSpacingRatio); // Size the zone with minor spacing
+      const zoneSideLength = availableGridCellSize * (1 - minorSpacingRatio);
 
-      // Distribute zones across rows to balance them optimally
       const zonesPerRow: number[] = [];
       let remainingZones = zoneCount;
 
@@ -191,7 +199,6 @@ export default defineComponent({
         remainingZones -= zonesInCurrentRow;
       }
 
-      // Place the zones on the canvas
       let zoneIndex = 0;
       zonesPerRow.forEach((zonesInRow, rowIndex) => {
         for (let colIndex = 0; colIndex < zonesInRow; colIndex++) {
@@ -220,51 +227,97 @@ export default defineComponent({
       });
     }
 
-    // Function to save the canvas as JSON when the game finishes
     function onFinish() {
       if (whiteBoard.value) {
         const canvas = whiteBoard.value.canvas();
-
-        // Convert the canvas to a JSON string
         const canvasJSON = canvas.toJSON();
-
-        // Upload the canvas JSON to Firebase under the appropriate path
         uploadCanvasResultToFirebase(canvasJSON);
-        
         emit('gameFinished');
       }
     }
 
-    // Upload the canvas result to Firebase
+    function onLoadData() {
+      if (whiteBoard.value) {
+        const canvas = whiteBoard.value.canvas();
+
+        canvas.loadFromJSON(testLoadData, () => {
+          // Ensure each image has crossOrigin set to 'anonymous' after loading from JSON
+          canvas.getObjects().forEach((obj, index) => {
+            if (obj.type === 'image') {
+              obj.set({ crossOrigin: 'anonymous' });
+            }
+
+            // Additional logic to make specific objects non-selectable and non-evented
+            if (index === 0 || index === 1 || index === 2) {
+              obj.selectable = false;
+              obj.evented = false;
+            }
+          });
+
+          // Render the canvas to apply the changes
+          setTimeout(() => {
+            canvas.renderAll();
+          }, 50);
+
+          console.log("Canvas successfully loaded from testLoadData.json.");
+        });
+      }
+    }
+
+
+    function onDownloadImage() {
+      if (whiteBoard.value) {
+        const canvas = whiteBoard.value.canvas();
+        const dataURL = canvas.toDataURL({ format: 'png', quality: 0.8, multiplier: 1 });
+        const link = document.createElement('a');
+        link.href = dataURL;
+        setTimeout(() => {
+          link.download = 'whiteboard.png';
+          link.click();
+        }, 50);
+      }
+    }
+
+
     async function uploadCanvasResultToFirebase(canvasJSON: any) {
       const userUID = authentication.currentUser?.uid;
       const sessionIdValue = sessionId;
 
-      if (!userUID || !sessionIdValue) {
-        console.error("User not authenticated or sessionId is missing.");
+      if (!userUID || !sessionIdValue || !whiteBoard.value) {
+        console.error("User not authenticated, sessionId missing, or WhiteBoard component not found.");
         return;
       }
 
       try {
-        // Define the file path
-        const filePath = `${sessionIdValue}/AssociationGame/Results/${userUID}.json`;
+        // Upload JSON file to Firebase
+        const jsonFilePath = `${sessionIdValue}/AssociationGame/Results/${userUID}.json`;
         const jsonBlob = new Blob([JSON.stringify(canvasJSON)], { type: 'application/json' });
-
-        // Upload the JSON to Firebase Storage
         const storage = getStorage();
-        const fileRef = storageRef(storage, filePath);
-        await uploadBytes(fileRef, jsonBlob);
-        
-        console.log("Canvas JSON successfully uploaded:", filePath);
+        /* const jsonFileRef = storageRef(storage, jsonFilePath);
+        await uploadBytes(jsonFileRef, jsonBlob); */
+
+        console.log("Canvas JSON successfully uploaded:", jsonFilePath);
+
+        // Generate image from canvas and upload
+        const canvas = whiteBoard.value.canvas();
+        const dataURL = canvas.toDataURL({ format: 'png', quality: 0.8, multiplier: 1 });
+        const imageBlob = await (await fetch(dataURL)).blob(); // Convert dataURL to blob
+        const imageFilePath = `${sessionIdValue}/AssociationGame/Images/${userUID}.png`;
+        const imageFileRef = storageRef(storage, imageFilePath);
+        await uploadBytes(imageFileRef, imageBlob);
+
+        console.log("Canvas image successfully uploaded:", imageFilePath);
       } catch (error) {
-        console.error("Error uploading canvas JSON to Firebase:", error);
+        console.error("Error uploading canvas result to Firebase:", error);
       }
     }
 
     return {
       whiteBoard,
       tools,
-      onFinish
+      onFinish,
+      onLoadData,
+      onDownloadImage
     };
   }
 });

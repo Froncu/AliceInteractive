@@ -31,3 +31,13 @@
     left: 95%;
     top: 95%;
 }
+.load-button {
+    position: absolute;
+    left: 60%;
+    top: 95%;
+}
+.image-button {
+    position: absolute;
+    left: 80%;
+    top: 95%;
+}

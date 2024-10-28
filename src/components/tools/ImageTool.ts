@@ -43,6 +43,8 @@ export class ImageTool extends BaseTool {
 
   place(event: fabric.TPointerEventInfo): void {
     const imgElement = new Image();
+    imgElement.crossOrigin = 'anonymous';  // Explicitly set crossOrigin
+
     imgElement.src = this.m_settings.photoURL;
 
     imgElement.onload = () => {

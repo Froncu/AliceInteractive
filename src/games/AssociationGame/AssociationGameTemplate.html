@@ -1,5 +1,9 @@
 <div class="association-game">
     <WhiteBoard class="white-board-container" ref="whiteBoard" name="main" />
     <ToolBar class="tool-bar-container" :whiteBoard="whiteBoard" :tools="tools" />
+    <button class="load-button" @click="onLoadData">LoadData</button>
+    <button class="image-button" @click="onDownloadImage">IMAGE</button>
     <button class="finish-button" @click="onFinish">Finish</button>
+    
+   
 </div>

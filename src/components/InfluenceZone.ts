@@ -64,30 +64,32 @@ export class InfluenceZone {
 
     if (this.zoneImage) {
       const imgElement = new Image();
+      imgElement.crossOrigin = 'anonymous';  // Explicitly set crossOrigin
       imgElement.src = this.zoneImage;
-
+    
       imgElement.onload = () => {
-        const customImage = new fabric.FabricImage(imgElement, {
+        const customImage = new fabric.Image(imgElement, {
           selectable: false,
           evented: false,
           hasControls: false,
+          crossOrigin: 'anonymous'  // Also ensure crossOrigin is set on fabric.Image
         });
-
+    
         customImage.scaleToHeight(this.zoneSize);
         customImage.scaleToWidth(this.zoneSize);
-
+    
         customImage.set({
-          top: zonePos.y - customImage.getScaledHeight()/2,
-          left: zonePos.x - customImage.getScaledWidth()/2,
+          top: zonePos.y - customImage.getScaledHeight() / 2,
+          left: zonePos.x - customImage.getScaledWidth() / 2,
         });
-
+    
         text.set({
           left: circle.left + circle.width / 2 - text.width / 2,
-          top: circle.top + circle.height / 2 + customImage.getScaledHeight()/2,
+          top: circle.top + circle.height / 2 + customImage.getScaledHeight() / 2,
         });
-
+    
         groupElements.push(customImage);
-
+    
         const circleWithText = new fabric.Group(groupElements, {
           selectable: false,
           hasBorders: false,
@@ -96,7 +98,7 @@ export class InfluenceZone {
           lockMovementY: true,
           evented: false,
         });
-
+    
         // Add the image to the canvas
         canvas.add(circleWithText);
         canvas.renderAll();
